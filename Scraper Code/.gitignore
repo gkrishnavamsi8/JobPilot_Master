@@ -1,0 +1,26 @@
+# Secrets & local config
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Local scrape output
+data/
+*.xlsx
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/

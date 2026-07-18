@@ -1,0 +1,10 @@
+requests>=2.32,<3
+beautifulsoup4>=4.12,<5
+lxml>=5.2,<6
+psycopg[binary,pool]>=3.1,<4
+psycopg_pool>=3.2,<4
+python-dotenv>=1.0,<2
+tenacity>=8.2,<10
+openpyxl>=3.1,<4
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30,<1
