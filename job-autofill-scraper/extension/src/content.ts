@@ -223,6 +223,47 @@ function isWorkdayJobPage(): boolean {
     && (/\/job\//i.test(window.location.pathname) || /\/jobs\//i.test(window.location.pathname));
 }
 
+function isApplyPage(): boolean {
+  const path = window.location.pathname.toLowerCase();
+  const href = window.location.href.toLowerCase();
+  return /\/apply/i.test(path)
+    || /jobapplication/i.test(href)
+    || Boolean(document.querySelector(
+      '[data-automation-id="applyManually"], [data-automation-id="formField"], [data-automation-id="file-upload-input-ref"]',
+    ));
+}
+
+function isJobPilotEligiblePage(): boolean {
+  return isWorkdayJobPage() || isApplyPage() || Boolean(readContextFromUrl());
+}
+
+const DOCK_DISMISS_KEY = `jobpilot_dock_dismissed_${window.location.hostname}`;
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function isDockDismissed(): boolean {
+  try {
+    return sessionStorage.getItem(DOCK_DISMISS_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function dismissDock(): void {
+  try {
+    sessionStorage.setItem(DOCK_DISMISS_KEY, '1');
+  } catch {
+    // Ignore storage failures.
+  }
+  removeSideDock();
+}
+
 function findBannerAnchor(): HTMLElement | null {
   const applyButton = document.querySelector<HTMLElement>(
     [
@@ -264,8 +305,160 @@ function removeBanner(): void {
   document.getElementById('jobpilot-match-banner')?.remove();
 }
 
+function removeSideDock(): void {
+  document.getElementById('jobpilot-side-dock')?.remove();
+}
+
 function removeFloatingPanel(): void {
-  document.getElementById('jobpilot-floating-panel')?.remove();
+  removeSideDock();
+}
+
+function setDockOpen(open: boolean): void {
+  const dock = document.getElementById('jobpilot-side-dock');
+  if (!dock) {
+    return;
+  }
+  dock.classList.toggle('jp-dock--open', open);
+  dock.classList.toggle('jp-dock--collapsed', !open);
+}
+
+interface SideDockOptions {
+  score: number;
+  matchedCount: number;
+  totalKeywords: number;
+  matched: string[];
+  missing: string[];
+  onAutofill?: () => void;
+  setupMessage?: string;
+  openByDefault?: boolean;
+}
+
+function renderSideDock(options: SideDockOptions): void {
+  if (isDockDismissed()) {
+    return;
+  }
+
+  removeSideDock();
+
+  const host = document.createElement('div');
+  host.id = 'jobpilot-side-dock';
+  host.className = options.openByDefault === false ? 'jp-dock jp-dock--collapsed' : 'jp-dock jp-dock--open';
+
+  const matchedPreview = options.matched.slice(0, 6).map(escapeHtml).join(', ') || 'None';
+  const missingPreview = options.missing.slice(0, 6).map(escapeHtml).join(', ') || 'None';
+  const setupBlock = options.setupMessage
+    ? `<p class="jp-dock-setup">${escapeHtml(options.setupMessage)}</p>`
+    : `
+      <div class="jp-dock-score">${Math.round(options.score)}%</div>
+      <p class="jp-dock-subtitle">
+        ${options.matchedCount} of ${options.totalKeywords} keywords matched
+      </p>
+      <p class="jp-dock-detail"><strong>Matched:</strong> ${matchedPreview}</p>
+      <p class="jp-dock-detail jp-dock-detail--missing"><strong>Missing:</strong> ${missingPreview}</p>
+    `;
+
+  host.innerHTML = `
+    <div class="jp-dock-panel" role="complementary" aria-label="JobPilot assistant">
+      <div class="jp-dock-panel-header">
+        <strong>JobPilot</strong>
+        <button type="button" class="jp-dock-panel-close" aria-label="Collapse panel">›</button>
+      </div>
+      <div class="jp-dock-panel-body">
+        <p class="jp-dock-heading">Resume Match</p>
+        ${setupBlock}
+        <div id="jobpilot-dock-fill-result" class="jp-dock-fill-result hidden"></div>
+        ${
+          options.onAutofill
+            ? '<button type="button" id="jobpilot-dock-autofill" class="jp-dock-autofill">Autofill application</button>'
+            : ''
+        }
+      </div>
+    </div>
+    <div class="jp-dock-tab" aria-label="JobPilot">
+      <button type="button" class="jp-dock-close" aria-label="Close JobPilot">×</button>
+      <div class="jp-dock-logo" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1400" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 4 3 3-9 9H6v-3l9-9Z" />
+          <path d="M9 15l-3 3" />
+        </svg>
+      </div>
+      <button type="button" class="jp-dock-grip" aria-label="Toggle JobPilot panel">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  `;
+
+  document.documentElement.appendChild(host);
+
+  host.querySelector('.jp-dock-close')?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    dismissDock();
+  });
+
+  host.querySelector('.jp-dock-panel-close')?.addEventListener('click', () => {
+    setDockOpen(false);
+  });
+
+  host.querySelector('.jp-dock-grip')?.addEventListener('click', () => {
+    const dock = document.getElementById('jobpilot-side-dock');
+    if (!dock) {
+      return;
+    }
+    setDockOpen(!dock.classList.contains('jp-dock--open'));
+  });
+
+  host.querySelector('.jp-dock-tab')?.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement;
+    if (target.closest('.jp-dock-close') || target.closest('.jp-dock-grip')) {
+      return;
+    }
+    setDockOpen(true);
+  });
+
+  if (options.onAutofill) {
+    host.querySelector('#jobpilot-dock-autofill')?.addEventListener('click', options.onAutofill);
+  }
+}
+
+interface FillSummary {
+  filled: Array<{ jsonPath: string }>;
+  skipped: Array<{ jsonPath: string }>;
+  failed: Array<{ jsonPath: string; message?: string }>;
+}
+
+function updateDockFillResult(summary: FillSummary): void {
+  const dock = document.getElementById('jobpilot-side-dock');
+  const resultEl = dock?.querySelector('#jobpilot-dock-fill-result');
+  if (!dock || !resultEl) {
+    return;
+  }
+
+  setDockOpen(true);
+  resultEl.classList.remove('hidden');
+
+  const failureItems = summary.failed
+    .map(
+      (item) => `
+        <div class="jp-dock-failure">
+          <span class="jp-dock-failure-field">${escapeHtml(item.jsonPath)}</span>
+          <span class="jp-dock-failure-message">${escapeHtml(item.message ?? 'Unknown error')}</span>
+        </div>
+      `,
+    )
+    .join('');
+
+  resultEl.innerHTML = `
+    <div class="jp-dock-fill-summary ${summary.failed.length ? 'is-error' : 'is-success'}">
+      <strong>${summary.failed.length ? 'Autofill completed with errors' : 'Autofill successful'}</strong>
+      <div class="jp-dock-fill-stats">
+        <span>${summary.filled.length} filled</span>
+        <span>${summary.skipped.length} skipped</span>
+        <span>${summary.failed.length} failed</span>
+      </div>
+      ${summary.failed.length ? `<div class="jp-dock-fill-failures">${failureItems}</div>` : ''}
+    </div>
+  `;
 }
 
 function buildGaugeSvg(score: number): string {
@@ -276,13 +469,13 @@ function buildGaugeSvg(score: number): string {
 
   return `
     <svg viewBox="0 0 56 56" aria-hidden="true">
-      <circle cx="28" cy="28" r="${radius}" fill="none" stroke="#dbeafe" stroke-width="6"></circle>
+      <circle cx="28" cy="28" r="${radius}" fill="none" stroke="#262B33" stroke-width="6"></circle>
       <circle
         cx="28"
         cy="28"
         r="${radius}"
         fill="none"
-        stroke="#14b8a6"
+        stroke="#F2B84B"
         stroke-width="6"
         stroke-linecap="round"
         stroke-dasharray="${dash} ${circumference - dash}"
@@ -364,34 +557,10 @@ function renderFloatingPanel(options: {
   missing: string[];
   onAutofill: () => void;
 }): void {
-  removeFloatingPanel();
-
-  const host = document.createElement('div');
-  host.id = 'jobpilot-floating-panel';
-
-  const panel = document.createElement('div');
-  panel.style.cssText =
-    'width:320px;background:#111827;color:#f8fafc;border:1px solid #334155;border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.45);padding:16px;';
-
-  panel.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-      <strong style="font-size:14px;">JobPilot Match</strong>
-      <button id="jobpilot-dismiss" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:18px;">×</button>
-    </div>
-    <div style="font-size:32px;font-weight:700;color:#60a5fa;margin-bottom:8px;">${options.score.toFixed(1)}%</div>
-    <div style="font-size:12px;color:#cbd5e1;margin-bottom:8px;">
-      ${options.matchedCount} of ${options.totalKeywords} keywords matched
-    </div>
-    <div style="font-size:12px;color:#cbd5e1;margin-bottom:8px;"><strong>Matched:</strong> ${options.matched.slice(0, 6).join(', ') || 'None'}</div>
-    <div style="font-size:12px;color:#fca5a5;margin-bottom:12px;"><strong>Missing:</strong> ${options.missing.slice(0, 6).join(', ') || 'None'}</div>
-    <button id="jobpilot-autofill" style="width:100%;padding:10px 12px;border:none;border-radius:10px;background:#2563eb;color:white;font-weight:600;cursor:pointer;">Autofill application</button>
-  `;
-
-  host.appendChild(panel);
-  document.documentElement.appendChild(host);
-
-  panel.querySelector('#jobpilot-dismiss')?.addEventListener('click', removeFloatingPanel);
-  panel.querySelector('#jobpilot-autofill')?.addEventListener('click', options.onAutofill);
+  renderSideDock({
+    ...options,
+    openByDefault: isApplyPage(),
+  });
 }
 
 function computeAnalysis(profileText: string, jobDescription: string): MatchAnalysis {
@@ -448,27 +617,27 @@ async function showMatchOverlay(context: MatchContext): Promise<void> {
         totalKeywords: analysis.totalKeywords,
         onAutofill,
       });
-      if (!rendered) {
-        renderFloatingPanel({
-          score: analysis.score,
-          matchedCount: analysis.matchedCount,
-          totalKeywords: analysis.totalKeywords,
-          matched: analysis.matched,
-          missing: analysis.missing,
-          onAutofill,
-        });
-      }
+      renderSideDock({
+        score: analysis.score,
+        matchedCount: analysis.matchedCount,
+        totalKeywords: analysis.totalKeywords,
+        matched: analysis.matched,
+        missing: analysis.missing,
+        onAutofill,
+        openByDefault: isApplyPage() || !rendered,
+      });
       domRetryCount = MAX_DOM_RETRIES;
       return;
     }
 
-    renderFloatingPanel({
+    renderSideDock({
       score: analysis.score,
       matchedCount: analysis.matchedCount,
       totalKeywords: analysis.totalKeywords,
       matched: analysis.matched,
       missing: analysis.missing,
       onAutofill,
+      openByDefault: true,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Match scoring unavailable.';
@@ -477,28 +646,33 @@ async function showMatchOverlay(context: MatchContext): Promise<void> {
     const needsProfile = /profile|candidate|fetch profile/i.test(message);
     const isQuotaError = /MAX_WRITE_OPERATIONS|quota/i.test(message);
 
-    if (isWorkdayJobPage()) {
+    if (isWorkdayJobPage() || isApplyPage()) {
       await waitForBannerAnchor();
-      const rendered = renderInlineBanner({
+      const rendered = isWorkdayJobPage()
+        ? renderInlineBanner({
+          setupMessage: isQuotaError
+            ? 'JobPilot is syncing your profile. Refresh this page in a few seconds.'
+            : needsProfile
+              ? message
+              : 'Could not score this job yet. Save your profile on JobPilot and refresh.',
+          score: 0,
+          matchedCount: 0,
+          totalKeywords: 0,
+        })
+        : false;
+      renderSideDock({
+        score: 0,
+        matchedCount: 0,
+        totalKeywords: 0,
+        matched: [],
+        missing: [message],
         setupMessage: isQuotaError
           ? 'JobPilot is syncing your profile. Refresh this page in a few seconds.'
           : needsProfile
             ? message
             : 'Could not score this job yet. Save your profile on JobPilot and refresh.',
-        score: 0,
-        matchedCount: 0,
-        totalKeywords: 0,
+        openByDefault: isApplyPage() || !rendered,
       });
-      if (!rendered) {
-        renderFloatingPanel({
-          score: 0,
-          matchedCount: 0,
-          totalKeywords: 0,
-          matched: [],
-          missing: [message],
-          onAutofill: () => undefined,
-        });
-      }
     }
   } finally {
     overlayInFlight = false;
@@ -512,11 +686,18 @@ async function runAutofill(candidateData: CandidateData): Promise<void> {
       onLog: (msg, detail) => console.log('[JobPilot]', msg, detail ?? ''),
     });
 
-    removeBanner();
-    removeFloatingPanel();
-    alert(`JobPilot filled ${summary.filled.length} fields. Skipped ${summary.skipped.length}.`);
+    updateDockFillResult(summary);
   } catch (error) {
-    alert(error instanceof Error ? error.message : 'Autofill failed');
+    const message = error instanceof Error ? error.message : 'Autofill failed';
+    const dock = document.getElementById('jobpilot-side-dock');
+    const resultEl = dock?.querySelector('#jobpilot-dock-fill-result');
+    if (dock && resultEl) {
+      setDockOpen(true);
+      resultEl.classList.remove('hidden');
+      resultEl.innerHTML = `<div class="jp-dock-fill-summary is-error"><strong>Autofill failed</strong><p>${escapeHtml(message)}</p></div>`;
+    } else {
+      alert(message);
+    }
   }
 }
 
@@ -563,7 +744,7 @@ function bootMatchWidget(): void {
   const urlContext = readContextFromUrl();
   const context: MatchContext = urlContext ?? {};
 
-  if (isWorkdayJobPage() || urlContext) {
+  if (isJobPilotEligiblePage()) {
     void showMatchOverlay(context);
   }
 
@@ -581,9 +762,12 @@ function bootMatchWidget(): void {
     });
   }
 
-  if (isWorkdayJobPage()) {
+  if (isWorkdayJobPage() || isApplyPage()) {
     const observer = new MutationObserver(() => {
-      if (document.getElementById('jobpilot-match-banner') || document.getElementById('jobpilot-floating-panel')) {
+      if (
+        document.getElementById('jobpilot-match-banner')
+        || document.getElementById('jobpilot-side-dock')
+      ) {
         return;
       }
       scheduleMatchRefresh(context);

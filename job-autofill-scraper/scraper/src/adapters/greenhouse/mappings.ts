@@ -30,9 +30,15 @@ export const GREENHOUSE_FIELD_MAPPINGS: FieldMapping[] = [
     fieldType: 'text',
   },
   {
-    labelSynonyms: ['phone'],
-    namePattern: /phone/i,
-    idPattern: /^phone$/i,
+    labelSynonyms: ['phone device type', 'phone type', 'device type'],
+    namePattern: /phone.*device|device.*type|phone_type/i,
+    jsonPath: 'profile.phone.type',
+    fieldType: 'dropdown',
+  },
+  {
+    labelSynonyms: ['phone', 'phone number'],
+    namePattern: /phone[_-]?number|^phone$/i,
+    idPattern: /^phone(?:[_-]?number)?$/i,
     automationIdPattern: 'phone',
     jsonPath: 'profile.phone.number',
     fieldType: 'text',

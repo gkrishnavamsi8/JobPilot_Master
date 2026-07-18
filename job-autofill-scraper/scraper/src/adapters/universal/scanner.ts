@@ -5,6 +5,7 @@ import {
   findMappingByAttributes,
   findMappingByLabel,
   normalizeLabelText,
+  shouldRejectPhoneNumberMapping,
 } from './label-utils.js';
 import {
   collectFieldHints,
@@ -13,6 +14,7 @@ import {
   resolveDropdownContainer,
 } from './label-resolver.js';
 import { UNIVERSAL_FIELD_MAPPINGS } from './mappings.js';
+import { resolveFieldValue } from './resolve-field-value.js';
 
 const INPUT_SELECTOR =
   'input:not([type="hidden"]):not([type="submit"]):not([type="button"]), textarea, select';
@@ -67,7 +69,7 @@ function addScannedField(
   const target = resolveFillElement(element, fieldType);
   if (!target || seen.has(target)) return;
 
-  const value = getValueAtPath(candidateData, mapping.jsonPath);
+  const value = resolveFieldValue(resolvedMapping, candidateData);
   if (isEmptyValue(value) && fieldType !== 'file' && fieldType !== 'checkbox') return;
 
   seen.add(target);
@@ -120,6 +122,7 @@ function matchElement(
   const mapping =
     findMappingByAttributes(element, mappings) ?? findBestMapping(hints, mappings);
   if (!mapping) return;
+  if (hints.some((hint) => shouldRejectPhoneNumberMapping(mapping, hint))) return;
 
   addScannedField(
     results,

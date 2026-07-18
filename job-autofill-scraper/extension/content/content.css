@@ -1,6 +1,6 @@
 #jobpilot-match-banner {
   box-sizing: border-box;
-  font-family: Inter, "Segoe UI", system-ui, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 #jobpilot-match-banner *,
@@ -15,10 +15,10 @@
   gap: 16px;
   width: 100%;
   padding: 14px 18px;
-  border: 1px solid #dbeafe;
+  border: 1px solid #262b33;
   border-radius: 12px;
-  background: linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  background: linear-gradient(180deg, #15181d 0%, #1b1f26 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
 }
 
 #jobpilot-match-banner .jp-gauge {
@@ -42,7 +42,7 @@
   justify-content: center;
   font-size: 13px;
   font-weight: 700;
-  color: #0f766e;
+  color: #f2b84b;
 }
 
 #jobpilot-match-banner .jp-copy {
@@ -52,21 +52,22 @@
 
 #jobpilot-match-banner .jp-title {
   margin: 0 0 4px;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 700;
-  color: #0f172a;
+  color: #f2f3f5;
 }
 
 #jobpilot-match-banner .jp-subtitle {
   margin: 0;
   font-size: 13px;
-  color: #475569;
+  color: #8b93a1;
 }
 
 #jobpilot-match-banner .jp-meta {
   margin: 6px 0 0;
   font-size: 12px;
-  color: #64748b;
+  color: #6b7280;
 }
 
 #jobpilot-match-banner .jp-actions {
@@ -80,42 +81,282 @@
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: #2563eb;
+  color: #f2b84b;
 }
 
 #jobpilot-match-banner .jp-autofill {
   border: none;
   border-radius: 999px;
   padding: 8px 14px;
-  background: #2563eb;
-  color: #fff;
+  background: #f2b84b;
+  color: #1a1400;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
 
 #jobpilot-match-banner .jp-autofill:hover {
-  background: #1d4ed8;
+  background: #d9a23b;
 }
 
 #jobpilot-match-banner .jp-dismiss {
   border: none;
   background: transparent;
-  color: #94a3b8;
+  color: #565e6b;
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
 }
 
-#jobpilot-floating-panel {
+#jobpilot-side-dock {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
   z-index: 2147483647;
-  font-family: Inter, "Segoe UI", sans-serif;
+  display: flex;
+  align-items: stretch;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  pointer-events: none;
+}
+
+#jobpilot-side-dock * {
+  box-sizing: border-box;
+}
+
+#jobpilot-side-dock .jp-dock-panel,
+#jobpilot-side-dock .jp-dock-tab,
+#jobpilot-side-dock button {
+  pointer-events: auto;
+}
+
+#jobpilot-side-dock .jp-dock-panel {
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  background: #15181d;
+  color: #f2f3f5;
+  border: 1px solid #262b33;
+  border-right: none;
+  border-radius: 16px 0 0 16px;
+  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.35);
+  transition: width 0.25s ease, opacity 0.2s ease;
+}
+
+#jobpilot-side-dock.jp-dock--open .jp-dock-panel {
+  width: 300px;
+  opacity: 1;
+}
+
+#jobpilot-side-dock .jp-dock-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid #262b33;
+  font-size: 13px;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+}
+
+#jobpilot-side-dock .jp-dock-panel-close {
+  border: none;
+  background: transparent;
+  color: #8b93a1;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#jobpilot-side-dock .jp-dock-panel-body {
+  padding: 14px;
+  max-height: min(70vh, 420px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #f2b84b #1b1f26;
+}
+
+#jobpilot-side-dock .jp-dock-panel-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+#jobpilot-side-dock .jp-dock-panel-body::-webkit-scrollbar-thumb {
+  background: #d9a23b;
+  border-radius: 999px;
+}
+
+#jobpilot-side-dock .jp-dock-heading {
+  margin: 0 0 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8b93a1;
+}
+
+#jobpilot-side-dock .jp-dock-score {
+  font-size: 34px;
+  font-weight: 700;
+  color: #f2b84b;
+  margin-bottom: 6px;
+}
+
+#jobpilot-side-dock .jp-dock-subtitle,
+#jobpilot-side-dock .jp-dock-detail,
+#jobpilot-side-dock .jp-dock-setup {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #cbd5e1;
+}
+
+#jobpilot-side-dock .jp-dock-detail--missing {
+  color: #fca5a5;
+  margin-bottom: 12px;
+}
+
+#jobpilot-side-dock .jp-dock-autofill {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  background: #f2b84b;
+  color: #1a1400;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#jobpilot-side-dock .jp-dock-autofill:hover {
+  background: #d9a23b;
+}
+
+#jobpilot-side-dock .jp-dock-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 52px;
+  min-height: 72px;
+  background: #fff3d6;
+  border: 1px solid rgba(242, 184, 75, 0.45);
+  border-right: none;
+  border-radius: 14px 0 0 14px;
+  box-shadow: -6px 0 24px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+}
+
+#jobpilot-side-dock .jp-dock-close {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: #d9a23b;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+#jobpilot-side-dock .jp-dock-logo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 4px;
+}
+
+#jobpilot-side-dock .jp-dock-grip {
+  width: 18px;
+  align-self: stretch;
+  border: none;
+  border-left: 1px solid rgba(217, 162, 59, 0.35);
+  border-radius: 0 0 0 12px;
+  background: #d9a23b;
+  display: grid;
+  grid-template-columns: repeat(2, 4px);
+  grid-template-rows: repeat(3, 4px);
+  gap: 3px;
+  place-content: center;
+  cursor: grab;
+  padding: 0;
+}
+
+#jobpilot-side-dock .jp-dock-grip span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  display: block;
+}
+
+#jobpilot-side-dock .jp-dock-fill-result.hidden {
+  display: none;
+}
+
+#jobpilot-side-dock .jp-dock-fill-summary {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #262b33;
+  background: #1b1f26;
+  font-size: 12px;
+}
+
+#jobpilot-side-dock .jp-dock-fill-summary.is-success {
+  border-color: rgba(74, 222, 128, 0.35);
+}
+
+#jobpilot-side-dock .jp-dock-fill-summary.is-error {
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+#jobpilot-side-dock .jp-dock-fill-stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  color: #8b93a1;
+}
+
+#jobpilot-side-dock .jp-dock-fill-failures {
+  margin-top: 8px;
+  max-height: 120px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #f2b84b transparent;
+}
+
+#jobpilot-side-dock .jp-dock-failure {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  margin-top: 6px;
+  border-radius: 8px;
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+#jobpilot-side-dock .jp-dock-failure-field {
+  font-family: 'IBM Plex Mono', monospace;
+  color: #fecaca;
+  font-size: 11px;
+}
+
+#jobpilot-side-dock .jp-dock-failure-message {
+  color: #fda4af;
+  font-size: 11px;
+  word-break: break-word;
+}
+
+#jobpilot-floating-panel {
+  display: none;
 }
 
 .jobpilot-highlight-resume {
-  outline: 2px solid #f59e0b !important;
+  outline: 2px solid #f2b84b !important;
   outline-offset: 2px;
 }

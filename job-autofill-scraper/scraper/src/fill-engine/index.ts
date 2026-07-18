@@ -42,17 +42,22 @@ export async function runFillEngine(
   let scanned = scanWithFallback(document, candidateData, config);
 
   const fillOrder: Record<string, number> = {
-    text: 0,
-    textarea: 1,
-    dropdown: 2,
+    dropdown: 0,
+    text: 1,
+    textarea: 2,
     multiselect: 3,
     checkbox: 4,
     repeatable: 5,
     file: 6,
   };
-  scanned.sort(
-    (a, b) => (fillOrder[a.mapping.fieldType] ?? 9) - (fillOrder[b.mapping.fieldType] ?? 9)
-  );
+  scanned.sort((a, b) => {
+    const typeOrder =
+      (fillOrder[a.mapping.fieldType] ?? 9) - (fillOrder[b.mapping.fieldType] ?? 9);
+    if (typeOrder !== 0) return typeOrder;
+    const countryPriority = (field: typeof a) =>
+      field.mapping.jsonPath === 'profile.address.country' ? 0 : 1;
+    return countryPriority(a) - countryPriority(b);
+  });
 
   const repeatable = scanned.filter((f) => f.mapping.fieldType === 'repeatable');
   const flat = scanned.filter((f) => f.mapping.fieldType !== 'repeatable');

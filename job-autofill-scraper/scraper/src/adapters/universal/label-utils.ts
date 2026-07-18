@@ -9,6 +9,16 @@ export function normalizeLabelText(text: string): string {
     .trim();
 }
 
+export function shouldRejectPhoneNumberMapping(mapping: FieldMapping, hintText: string): boolean {
+  if (mapping.jsonPath !== 'profile.phone.number') return false;
+  const hint = normalizeLabelText(hintText);
+  if (!hint) return false;
+  if (/device\s*type|phone\s*type|type\s*of\s*phone/i.test(hint)) return true;
+  if (/country\s*phone\s*code|phone\s*country\s*code/i.test(hint)) return true;
+  if (/country.*code|phone.*country|phone_country/i.test(hint)) return true;
+  return false;
+}
+
 export function labelMatchesSynonyms(labelText: string, synonyms: string[]): boolean {
   const normalized = normalizeLabelText(labelText);
   if (!normalized) return false;
@@ -29,6 +39,7 @@ export function findMappingByLabel(
 
   for (const mapping of mappings) {
     if (!mapping.labelSynonyms?.length) continue;
+    if (shouldRejectPhoneNumberMapping(mapping, labelText)) continue;
 
     for (const synonym of mapping.labelSynonyms) {
       const s = normalizeLabelText(synonym);
@@ -76,10 +87,13 @@ export function findMappingByAttributes(
     if (mapping.labelSynonyms?.some((s) => matchesPattern(placeholder, s))) score += 15;
     if (matchesPattern(autocomplete, mapping.namePattern)) score += 20;
 
+    const hintText = `${name} ${id} ${ariaLabel} ${placeholder}`;
+    if (shouldRejectPhoneNumberMapping(mapping, hintText)) continue;
+
     // Never map phone-number field to country-phone-code dropdowns
     if (
       mapping.jsonPath === 'profile.phone.number' &&
-      /country.*code|phone.*country|phone_country/i.test(`${name} ${id} ${ariaLabel}`)
+      /country.*code|phone.*country|phone_country/i.test(hintText)
     ) {
       continue;
     }
@@ -102,7 +116,7 @@ export function findBestMapping(
     if (!hint.trim()) continue;
 
     const byLabel = findMappingByLabel(hint, mappings);
-    if (byLabel) {
+    if (byLabel && !shouldRejectPhoneNumberMapping(byLabel, hint)) {
       const score = 50 + hint.length;
       if (!best || score > best.score) best = { mapping: byLabel, score };
     }

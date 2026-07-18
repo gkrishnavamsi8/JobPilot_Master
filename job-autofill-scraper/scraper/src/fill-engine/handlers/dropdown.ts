@@ -1,11 +1,11 @@
 import type { FillHandler, FillResult, FieldMapping, FillContext } from '../types.js';
+import { getDropdownSearchTerms } from '../../adapters/universal/resolve-field-value.js';
 import {
   dispatchMouseClick,
-  findBestMatchingOption,
+  findBestMatchingOptionFromTerms,
   findDropdownTrigger,
   normalizeMatchText,
   sleep,
-  textMatchesOption,
   waitForVisibleOptions,
 } from '../dom-utils.js';
 
@@ -15,14 +15,20 @@ async function fillNativeSelect(
   mapping: FieldMapping,
   context: FillContext
 ): Promise<FillResult> {
-  const desired = normalizeMatchText(value);
+  const searchTerms = getDropdownSearchTerms(mapping, context.candidateData, value);
   const optionElements = Array.from(select.options);
   let matched: HTMLOptionElement | undefined;
 
-  const matchedEl = findBestMatchingOption(optionElements, desired);
-  if (matchedEl instanceof HTMLOptionElement) matched = matchedEl;
+  for (const term of searchTerms) {
+    const matchedEl = findBestMatchingOptionFromTerms(optionElements, [term]);
+    if (matchedEl instanceof HTMLOptionElement) {
+      matched = matchedEl;
+      break;
+    }
+  }
 
   if (!matched) {
+    const desired = normalizeMatchText(value);
     for (const option of optionElements) {
       if (normalizeMatchText(option.value) === desired) {
         matched = option;
@@ -84,7 +90,8 @@ async function fillReactSelect(
 
   const searchRoot = container.ownerDocument?.body ?? container;
   const options = await waitForVisibleOptions(searchRoot);
-  const match = findBestMatchingOption(options, value);
+  const searchTerms = getDropdownSearchTerms(mapping, context.candidateData, value);
+  const match = findBestMatchingOptionFromTerms(options, searchTerms);
   if (!match) {
     return {
       success: false,
@@ -136,7 +143,8 @@ async function fillCustomDropdown(
     };
   }
 
-  const match = findBestMatchingOption(options, value);
+  const searchTerms = getDropdownSearchTerms(mapping, context.candidateData, value);
+  const match = findBestMatchingOptionFromTerms(options, searchTerms);
   if (!match) {
     return {
       success: false,

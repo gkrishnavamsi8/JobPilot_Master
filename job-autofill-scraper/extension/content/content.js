@@ -572,12 +572,22 @@
   function normalizeLabelText(text) {
     return normalizeText(text).replace(/\*/g, "").replace(/\(required\)/g, "").replace(/\s+/g, " ").trim();
   }
+  function shouldRejectPhoneNumberMapping(mapping, hintText) {
+    if (mapping.jsonPath !== "profile.phone.number") return false;
+    const hint = normalizeLabelText(hintText);
+    if (!hint) return false;
+    if (/device\s*type|phone\s*type|type\s*of\s*phone/i.test(hint)) return true;
+    if (/country\s*phone\s*code|phone\s*country\s*code/i.test(hint)) return true;
+    if (/country.*code|phone.*country|phone_country/i.test(hint)) return true;
+    return false;
+  }
   function findMappingByLabel(labelText, mappings) {
     const normalized = normalizeLabelText(labelText);
     if (!normalized) return void 0;
     let best;
     for (const mapping of mappings) {
       if (!mapping.labelSynonyms?.length) continue;
+      if (shouldRejectPhoneNumberMapping(mapping, labelText)) continue;
       for (const synonym of mapping.labelSynonyms) {
         const s = normalizeLabelText(synonym);
         if (!s) continue;
@@ -613,7 +623,9 @@
       if (mapping.labelSynonyms?.some((s) => matchesPattern(ariaLabel, s))) score += 25;
       if (mapping.labelSynonyms?.some((s) => matchesPattern(placeholder, s))) score += 15;
       if (matchesPattern(autocomplete, mapping.namePattern)) score += 20;
-      if (mapping.jsonPath === "profile.phone.number" && /country.*code|phone.*country|phone_country/i.test(`${name} ${id} ${ariaLabel}`)) {
+      const hintText = `${name} ${id} ${ariaLabel} ${placeholder}`;
+      if (shouldRejectPhoneNumberMapping(mapping, hintText)) continue;
+      if (mapping.jsonPath === "profile.phone.number" && /country.*code|phone.*country|phone_country/i.test(hintText)) {
         continue;
       }
       if (score > 0 && (!best || score > best.score)) {
@@ -627,7 +639,7 @@
     for (const hint of hints) {
       if (!hint.trim()) continue;
       const byLabel = findMappingByLabel(hint, mappings);
-      if (byLabel) {
+      if (byLabel && !shouldRejectPhoneNumberMapping(byLabel, hint)) {
         const score = 50 + hint.length;
         if (!best || score > best.score) best = { mapping: byLabel, score };
       }
@@ -672,7 +684,9 @@
     if (wrappingLabel) push(wrappingLabel.textContent);
     const container = element.closest(FIELD_CONTAINER_SELECTOR);
     if (container) {
-      const labelEl = container.querySelector(":scope > label, :scope > legend, :scope > .label");
+      const labelEl = container.querySelector(
+        ':scope > label, :scope > legend, :scope > .label, :scope [class*="label"], :scope [class*="Label"], :scope .text'
+      );
       if (labelEl && !labelEl.contains(element)) {
         push(labelEl.textContent);
       }
@@ -823,6 +837,86 @@
     fieldType: "textarea"
   };
 
+  // scraper/src/adapters/universal/resolve-field-value.ts
+  function isCountryPhoneCodeMapping(mapping) {
+    return mapping.labelSynonyms?.some(
+      (synonym) => /country phone code|phone country code/i.test(synonym)
+    ) ?? false;
+  }
+  function isPhoneDeviceTypeMapping(mapping) {
+    return mapping.jsonPath === "profile.phone.type";
+  }
+  function extractDialCodeFromPhoneNumber(phoneNumber) {
+    const trimmed = phoneNumber.trim();
+    if (!trimmed.startsWith("+")) return void 0;
+    const match = trimmed.match(/^\+(\d{1,3})/);
+    return match?.[1];
+  }
+  function getCountryPhoneCodeSearchTerms(candidateData) {
+    const profile = candidateData?.profile;
+    const address = profile?.address;
+    const phone = profile?.phone;
+    const country = String(address?.country ?? "").trim();
+    const phoneNumber = String(phone?.number ?? "").trim();
+    const explicitCode = String(phone?.country_code ?? "").trim();
+    const terms = [];
+    if (country) terms.push(country);
+    const dialCode = (explicitCode ? explicitCode.replace(/\D/g, "") : void 0) ?? extractDialCodeFromPhoneNumber(phoneNumber);
+    if (dialCode) {
+      terms.push(`+${dialCode}`);
+      terms.push(`(${dialCode})`);
+    }
+    return [...new Set(terms.filter(Boolean))];
+  }
+  function normalizePhoneTypeValue(value) {
+    const raw = String(value ?? "mobile").trim().toLowerCase();
+    if (!raw) return "Mobile";
+    if (raw === "mobile" || raw === "cell" || raw === "cellphone") return "Mobile";
+    if (raw === "home") return "Home";
+    if (raw === "work" || raw === "office") return "Work";
+    return raw.charAt(0).toUpperCase() + raw.slice(1);
+  }
+  function resolveFieldValue(mapping, candidateData) {
+    const raw = getValueAtPath(candidateData, mapping.jsonPath);
+    if (mapping.jsonPath === "profile.phone.number") {
+      return formatPhoneForField(raw, candidateData);
+    }
+    if (isPhoneDeviceTypeMapping(mapping)) {
+      return normalizePhoneTypeValue(raw);
+    }
+    if (isCountryPhoneCodeMapping(mapping)) {
+      const terms = getCountryPhoneCodeSearchTerms(candidateData);
+      return terms[0] ?? raw;
+    }
+    return raw;
+  }
+  function getDropdownSearchTerms(mapping, candidateData, primaryValue) {
+    const primary = String(primaryValue ?? "").trim();
+    const terms = primary ? [primary] : [];
+    if (isCountryPhoneCodeMapping(mapping)) {
+      for (const term of getCountryPhoneCodeSearchTerms(candidateData)) {
+        if (!terms.includes(term)) terms.push(term);
+      }
+    }
+    if (mapping.jsonPath === "profile.address.country" && !isCountryPhoneCodeMapping(mapping)) {
+      const normalized = primary.toLowerCase();
+      if (normalized === "united states" || normalized === "usa" || normalized === "us") {
+        terms.push("United States of America", "United States", "USA");
+      }
+      if (normalized === "india") {
+        terms.push("India");
+      }
+      if (normalized === "united kingdom" || normalized === "uk") {
+        terms.push("United Kingdom", "UK");
+      }
+    }
+    if (isPhoneDeviceTypeMapping(mapping)) {
+      const normalized = normalizePhoneTypeValue(primary);
+      terms.push(normalized, `${normalized} Phone`, normalized.toLowerCase());
+    }
+    return [...new Set(terms.filter(Boolean))];
+  }
+
   // scraper/src/fill-engine/dom-utils.ts
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -846,7 +940,14 @@
     if (a.startsWith(`${b} `) || a.startsWith(`${b}(`) || a.startsWith(`${b},`)) return true;
     return containsWholeWord(a, b);
   }
-  function findBestMatchingOption(options, desired) {
+  function findBestMatchingOptionFromTerms(options, desiredTerms) {
+    for (const desired of desiredTerms) {
+      const match = findBestMatchingOptionSingle(options, desired);
+      if (match) return match;
+    }
+    return void 0;
+  }
+  function findBestMatchingOptionSingle(options, desired) {
     const desiredNorm = normalizeMatchText(desired);
     if (!desiredNorm) return void 0;
     let best;
@@ -858,6 +959,8 @@
       if (norm === desiredNorm) score = 100;
       else if (norm.startsWith(`${desiredNorm} `) || norm.startsWith(`${desiredNorm}(`)) score = 90;
       else if (containsWholeWord(norm, desiredNorm)) score = 70;
+      else if (desiredNorm.startsWith("+") && norm.includes(desiredNorm)) score = 88;
+      else if (desiredNorm.startsWith("(") && norm.includes(desiredNorm)) score = 88;
       else if (desiredNorm.length >= 5 && norm.includes(desiredNorm)) score = 30;
       if (score > 0 && (!best || score > best.score)) {
         best = { element: opt, score };
@@ -972,12 +1075,18 @@
 
   // scraper/src/fill-engine/handlers/dropdown.ts
   async function fillNativeSelect(select, value, mapping, context) {
-    const desired = normalizeMatchText(value);
+    const searchTerms = getDropdownSearchTerms(mapping, context.candidateData, value);
     const optionElements = Array.from(select.options);
     let matched;
-    const matchedEl = findBestMatchingOption(optionElements, desired);
-    if (matchedEl instanceof HTMLOptionElement) matched = matchedEl;
+    for (const term of searchTerms) {
+      const matchedEl = findBestMatchingOptionFromTerms(optionElements, [term]);
+      if (matchedEl instanceof HTMLOptionElement) {
+        matched = matchedEl;
+        break;
+      }
+    }
     if (!matched) {
+      const desired = normalizeMatchText(value);
       for (const option of optionElements) {
         if (normalizeMatchText(option.value) === desired) {
           matched = option;
@@ -1026,7 +1135,8 @@
     }
     const searchRoot = container.ownerDocument?.body ?? container;
     const options = await waitForVisibleOptions(searchRoot);
-    const match = findBestMatchingOption(options, value);
+    const searchTerms = getDropdownSearchTerms(mapping, context.candidateData, value);
+    const match = findBestMatchingOptionFromTerms(options, searchTerms);
     if (!match) {
       return {
         success: false,
@@ -1067,7 +1177,8 @@
         message: "Dropdown options did not appear"
       };
     }
-    const match = findBestMatchingOption(options, value);
+    const searchTerms = getDropdownSearchTerms(mapping, context.candidateData, value);
+    const match = findBestMatchingOptionFromTerms(options, searchTerms);
     if (!match) {
       return {
         success: false,
@@ -1397,6 +1508,13 @@
       fieldType: "text"
     },
     {
+      labelSynonyms: ["phone device type", "phone type", "device type", "type of phone"],
+      namePattern: /phone.*device|device.*type|phone_type|phonetype/i,
+      idPattern: /phone.*device|device.*type|phone_type/i,
+      jsonPath: "profile.phone.type",
+      fieldType: "dropdown"
+    },
+    {
       labelSynonyms: ["phone number", "phone"],
       namePattern: /(?:^|\[)(?:phone[_-]?number|phone)(?:\]|$)/i,
       idPattern: /^phone(?:[_-]?number)?$/i,
@@ -1411,7 +1529,7 @@
       fieldType: "dropdown"
     },
     {
-      labelSynonyms: ["country"],
+      labelSynonyms: ["country", "country/region", "country or region", "country region"],
       namePattern: /(?:^|\[)country(?:\]|$)|^country$/i,
       idPattern: /^country$/i,
       automationIdPattern: /^country$/i,
@@ -1579,7 +1697,7 @@
     const resolvedMapping = { ...mapping, fieldType };
     const target = resolveFillElement(element, fieldType);
     if (!target || seen.has(target)) return;
-    const value = getValueAtPath(candidateData, mapping.jsonPath);
+    const value = resolveFieldValue(resolvedMapping, candidateData);
     if (isEmptyValue(value) && fieldType !== "file" && fieldType !== "checkbox") return;
     seen.add(target);
     results.push({ element: target, automationId: key, mapping: resolvedMapping, value });
@@ -1609,6 +1727,7 @@
     const hints = collectFieldHints(element);
     const mapping = findMappingByAttributes(element, mappings) ?? findBestMapping(hints, mappings);
     if (!mapping) return;
+    if (hints.some((hint) => shouldRejectPhoneNumberMapping(mapping, hint))) return;
     addScannedField(
       results,
       seen,
@@ -1683,17 +1802,20 @@
     log(`Scanning page (${hostname || "unknown host"})`);
     let scanned = scanWithFallback(document2, candidateData, config);
     const fillOrder = {
-      text: 0,
-      textarea: 1,
-      dropdown: 2,
+      dropdown: 0,
+      text: 1,
+      textarea: 2,
       multiselect: 3,
       checkbox: 4,
       repeatable: 5,
       file: 6
     };
-    scanned.sort(
-      (a, b) => (fillOrder[a.mapping.fieldType] ?? 9) - (fillOrder[b.mapping.fieldType] ?? 9)
-    );
+    scanned.sort((a, b) => {
+      const typeOrder = (fillOrder[a.mapping.fieldType] ?? 9) - (fillOrder[b.mapping.fieldType] ?? 9);
+      if (typeOrder !== 0) return typeOrder;
+      const countryPriority = (field) => field.mapping.jsonPath === "profile.address.country" ? 0 : 1;
+      return countryPriority(a) - countryPriority(b);
+    });
     const repeatable = scanned.filter((f) => f.mapping.fieldType === "repeatable");
     const flat = scanned.filter((f) => f.mapping.fieldType !== "repeatable");
     scanned = [...repeatable, ...flat];
@@ -1891,6 +2013,34 @@
   function isWorkdayJobPage() {
     return /myworkdayjobs\.com/i.test(window.location.hostname) && (/\/job\//i.test(window.location.pathname) || /\/jobs\//i.test(window.location.pathname));
   }
+  function isApplyPage() {
+    const path = window.location.pathname.toLowerCase();
+    const href = window.location.href.toLowerCase();
+    return /\/apply/i.test(path) || /jobapplication/i.test(href) || Boolean(document.querySelector(
+      '[data-automation-id="applyManually"], [data-automation-id="formField"], [data-automation-id="file-upload-input-ref"]'
+    ));
+  }
+  function isJobPilotEligiblePage() {
+    return isWorkdayJobPage() || isApplyPage() || Boolean(readContextFromUrl());
+  }
+  var DOCK_DISMISS_KEY = `jobpilot_dock_dismissed_${window.location.hostname}`;
+  function escapeHtml(value) {
+    return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function isDockDismissed() {
+    try {
+      return sessionStorage.getItem(DOCK_DISMISS_KEY) === "1";
+    } catch {
+      return false;
+    }
+  }
+  function dismissDock() {
+    try {
+      sessionStorage.setItem(DOCK_DISMISS_KEY, "1");
+    } catch {
+    }
+    removeSideDock();
+  }
   function findBannerAnchor() {
     const applyButton = document.querySelector(
       [
@@ -1926,8 +2076,115 @@
   function removeBanner() {
     document.getElementById("jobpilot-match-banner")?.remove();
   }
-  function removeFloatingPanel() {
-    document.getElementById("jobpilot-floating-panel")?.remove();
+  function removeSideDock() {
+    document.getElementById("jobpilot-side-dock")?.remove();
+  }
+  function setDockOpen(open) {
+    const dock = document.getElementById("jobpilot-side-dock");
+    if (!dock) {
+      return;
+    }
+    dock.classList.toggle("jp-dock--open", open);
+    dock.classList.toggle("jp-dock--collapsed", !open);
+  }
+  function renderSideDock(options) {
+    if (isDockDismissed()) {
+      return;
+    }
+    removeSideDock();
+    const host = document.createElement("div");
+    host.id = "jobpilot-side-dock";
+    host.className = options.openByDefault === false ? "jp-dock jp-dock--collapsed" : "jp-dock jp-dock--open";
+    const matchedPreview = options.matched.slice(0, 6).map(escapeHtml).join(", ") || "None";
+    const missingPreview = options.missing.slice(0, 6).map(escapeHtml).join(", ") || "None";
+    const setupBlock = options.setupMessage ? `<p class="jp-dock-setup">${escapeHtml(options.setupMessage)}</p>` : `
+      <div class="jp-dock-score">${Math.round(options.score)}%</div>
+      <p class="jp-dock-subtitle">
+        ${options.matchedCount} of ${options.totalKeywords} keywords matched
+      </p>
+      <p class="jp-dock-detail"><strong>Matched:</strong> ${matchedPreview}</p>
+      <p class="jp-dock-detail jp-dock-detail--missing"><strong>Missing:</strong> ${missingPreview}</p>
+    `;
+    host.innerHTML = `
+    <div class="jp-dock-panel" role="complementary" aria-label="JobPilot assistant">
+      <div class="jp-dock-panel-header">
+        <strong>JobPilot</strong>
+        <button type="button" class="jp-dock-panel-close" aria-label="Collapse panel">\u203A</button>
+      </div>
+      <div class="jp-dock-panel-body">
+        <p class="jp-dock-heading">Resume Match</p>
+        ${setupBlock}
+        <div id="jobpilot-dock-fill-result" class="jp-dock-fill-result hidden"></div>
+        ${options.onAutofill ? '<button type="button" id="jobpilot-dock-autofill" class="jp-dock-autofill">Autofill application</button>' : ""}
+      </div>
+    </div>
+    <div class="jp-dock-tab" aria-label="JobPilot">
+      <button type="button" class="jp-dock-close" aria-label="Close JobPilot">\xD7</button>
+      <div class="jp-dock-logo" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1400" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 4 3 3-9 9H6v-3l9-9Z" />
+          <path d="M9 15l-3 3" />
+        </svg>
+      </div>
+      <button type="button" class="jp-dock-grip" aria-label="Toggle JobPilot panel">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  `;
+    document.documentElement.appendChild(host);
+    host.querySelector(".jp-dock-close")?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      dismissDock();
+    });
+    host.querySelector(".jp-dock-panel-close")?.addEventListener("click", () => {
+      setDockOpen(false);
+    });
+    host.querySelector(".jp-dock-grip")?.addEventListener("click", () => {
+      const dock = document.getElementById("jobpilot-side-dock");
+      if (!dock) {
+        return;
+      }
+      setDockOpen(!dock.classList.contains("jp-dock--open"));
+    });
+    host.querySelector(".jp-dock-tab")?.addEventListener("click", (event) => {
+      const target = event.target;
+      if (target.closest(".jp-dock-close") || target.closest(".jp-dock-grip")) {
+        return;
+      }
+      setDockOpen(true);
+    });
+    if (options.onAutofill) {
+      host.querySelector("#jobpilot-dock-autofill")?.addEventListener("click", options.onAutofill);
+    }
+  }
+  function updateDockFillResult(summary) {
+    const dock = document.getElementById("jobpilot-side-dock");
+    const resultEl = dock?.querySelector("#jobpilot-dock-fill-result");
+    if (!dock || !resultEl) {
+      return;
+    }
+    setDockOpen(true);
+    resultEl.classList.remove("hidden");
+    const failureItems = summary.failed.map(
+      (item) => `
+        <div class="jp-dock-failure">
+          <span class="jp-dock-failure-field">${escapeHtml(item.jsonPath)}</span>
+          <span class="jp-dock-failure-message">${escapeHtml(item.message ?? "Unknown error")}</span>
+        </div>
+      `
+    ).join("");
+    resultEl.innerHTML = `
+    <div class="jp-dock-fill-summary ${summary.failed.length ? "is-error" : "is-success"}">
+      <strong>${summary.failed.length ? "Autofill completed with errors" : "Autofill successful"}</strong>
+      <div class="jp-dock-fill-stats">
+        <span>${summary.filled.length} filled</span>
+        <span>${summary.skipped.length} skipped</span>
+        <span>${summary.failed.length} failed</span>
+      </div>
+      ${summary.failed.length ? `<div class="jp-dock-fill-failures">${failureItems}</div>` : ""}
+    </div>
+  `;
   }
   function buildGaugeSvg(score) {
     const radius = 22;
@@ -1936,13 +2193,13 @@
     const dash = circumference * progress;
     return `
     <svg viewBox="0 0 56 56" aria-hidden="true">
-      <circle cx="28" cy="28" r="${radius}" fill="none" stroke="#dbeafe" stroke-width="6"></circle>
+      <circle cx="28" cy="28" r="${radius}" fill="none" stroke="#262B33" stroke-width="6"></circle>
       <circle
         cx="28"
         cy="28"
         r="${radius}"
         fill="none"
-        stroke="#14b8a6"
+        stroke="#F2B84B"
         stroke-width="6"
         stroke-linecap="round"
         stroke-dasharray="${dash} ${circumference - dash}"
@@ -2002,30 +2259,6 @@
     }
     return true;
   }
-  function renderFloatingPanel(options) {
-    removeFloatingPanel();
-    const host = document.createElement("div");
-    host.id = "jobpilot-floating-panel";
-    const panel = document.createElement("div");
-    panel.style.cssText = "width:320px;background:#111827;color:#f8fafc;border:1px solid #334155;border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.45);padding:16px;";
-    panel.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-      <strong style="font-size:14px;">JobPilot Match</strong>
-      <button id="jobpilot-dismiss" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:18px;">\xD7</button>
-    </div>
-    <div style="font-size:32px;font-weight:700;color:#60a5fa;margin-bottom:8px;">${options.score.toFixed(1)}%</div>
-    <div style="font-size:12px;color:#cbd5e1;margin-bottom:8px;">
-      ${options.matchedCount} of ${options.totalKeywords} keywords matched
-    </div>
-    <div style="font-size:12px;color:#cbd5e1;margin-bottom:8px;"><strong>Matched:</strong> ${options.matched.slice(0, 6).join(", ") || "None"}</div>
-    <div style="font-size:12px;color:#fca5a5;margin-bottom:12px;"><strong>Missing:</strong> ${options.missing.slice(0, 6).join(", ") || "None"}</div>
-    <button id="jobpilot-autofill" style="width:100%;padding:10px 12px;border:none;border-radius:10px;background:#2563eb;color:white;font-weight:600;cursor:pointer;">Autofill application</button>
-  `;
-    host.appendChild(panel);
-    document.documentElement.appendChild(host);
-    panel.querySelector("#jobpilot-dismiss")?.addEventListener("click", removeFloatingPanel);
-    panel.querySelector("#jobpilot-autofill")?.addEventListener("click", options.onAutofill);
-  }
   function computeAnalysis(profileText, jobDescription) {
     const analysis = analyzeMatch({
       professionalSummary: profileText,
@@ -2072,50 +2305,49 @@
           totalKeywords: analysis.totalKeywords,
           onAutofill
         });
-        if (!rendered) {
-          renderFloatingPanel({
-            score: analysis.score,
-            matchedCount: analysis.matchedCount,
-            totalKeywords: analysis.totalKeywords,
-            matched: analysis.matched,
-            missing: analysis.missing,
-            onAutofill
-          });
-        }
+        renderSideDock({
+          score: analysis.score,
+          matchedCount: analysis.matchedCount,
+          totalKeywords: analysis.totalKeywords,
+          matched: analysis.matched,
+          missing: analysis.missing,
+          onAutofill,
+          openByDefault: isApplyPage() || !rendered
+        });
         domRetryCount = MAX_DOM_RETRIES;
         return;
       }
-      renderFloatingPanel({
+      renderSideDock({
         score: analysis.score,
         matchedCount: analysis.matchedCount,
         totalKeywords: analysis.totalKeywords,
         matched: analysis.matched,
         missing: analysis.missing,
-        onAutofill
+        onAutofill,
+        openByDefault: true
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Match scoring unavailable.";
       console.error("[JobPilot] Match overlay failed:", error);
       const needsProfile = /profile|candidate|fetch profile/i.test(message);
       const isQuotaError = /MAX_WRITE_OPERATIONS|quota/i.test(message);
-      if (isWorkdayJobPage()) {
+      if (isWorkdayJobPage() || isApplyPage()) {
         await waitForBannerAnchor();
-        const rendered = renderInlineBanner({
+        const rendered = isWorkdayJobPage() ? renderInlineBanner({
           setupMessage: isQuotaError ? "JobPilot is syncing your profile. Refresh this page in a few seconds." : needsProfile ? message : "Could not score this job yet. Save your profile on JobPilot and refresh.",
           score: 0,
           matchedCount: 0,
           totalKeywords: 0
+        }) : false;
+        renderSideDock({
+          score: 0,
+          matchedCount: 0,
+          totalKeywords: 0,
+          matched: [],
+          missing: [message],
+          setupMessage: isQuotaError ? "JobPilot is syncing your profile. Refresh this page in a few seconds." : needsProfile ? message : "Could not score this job yet. Save your profile on JobPilot and refresh.",
+          openByDefault: isApplyPage() || !rendered
         });
-        if (!rendered) {
-          renderFloatingPanel({
-            score: 0,
-            matchedCount: 0,
-            totalKeywords: 0,
-            matched: [],
-            missing: [message],
-            onAutofill: () => void 0
-          });
-        }
       }
     } finally {
       overlayInFlight = false;
@@ -2127,11 +2359,18 @@
       const summary = await runFillEngine(document, candidateData, {
         onLog: (msg, detail) => console.log("[JobPilot]", msg, detail ?? "")
       });
-      removeBanner();
-      removeFloatingPanel();
-      alert(`JobPilot filled ${summary.filled.length} fields. Skipped ${summary.skipped.length}.`);
+      updateDockFillResult(summary);
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Autofill failed");
+      const message = error instanceof Error ? error.message : "Autofill failed";
+      const dock = document.getElementById("jobpilot-side-dock");
+      const resultEl = dock?.querySelector("#jobpilot-dock-fill-result");
+      if (dock && resultEl) {
+        setDockOpen(true);
+        resultEl.classList.remove("hidden");
+        resultEl.innerHTML = `<div class="jp-dock-fill-summary is-error"><strong>Autofill failed</strong><p>${escapeHtml(message)}</p></div>`;
+      } else {
+        alert(message);
+      }
     }
   }
   function syncProfileFromFrontend() {
@@ -2167,7 +2406,7 @@
     syncProfileFromFrontend();
     const urlContext = readContextFromUrl();
     const context = urlContext ?? {};
-    if (isWorkdayJobPage() || urlContext) {
+    if (isJobPilotEligiblePage()) {
       void showMatchOverlay(context);
     }
     chrome.storage.onChanged.addListener((changes, areaName) => {
@@ -2182,9 +2421,9 @@
         syncProfileFromFrontend();
       });
     }
-    if (isWorkdayJobPage()) {
+    if (isWorkdayJobPage() || isApplyPage()) {
       const observer = new MutationObserver(() => {
-        if (document.getElementById("jobpilot-match-banner") || document.getElementById("jobpilot-floating-panel")) {
+        if (document.getElementById("jobpilot-match-banner") || document.getElementById("jobpilot-side-dock")) {
           return;
         }
         scheduleMatchRefresh(context);
