@@ -8,7 +8,7 @@
     "build": "npm run build:shared && npm run build:scraper && npm run build:extension && npm run build:backend",
     "build:shared": "tsc -p shared/tsconfig.json",
     "build:scraper": "tsc -p scraper/tsconfig.json",
-    "build:extension": "node scripts/build-extension.mjs",
+    "build:extension": "node scripts/build-extension.mjs && node scripts/package-extension.mjs",
     "build:backend": "tsc -p backend/tsconfig.json",
     "dev:backend": "tsx watch backend/src/index.ts",
     "start:backend": "node backend/dist/index.js",
@@ -17,6 +17,7 @@
     "test:phone": "npm run build:shared && npm run build:scraper && node scripts/test-phone-country.mjs"
   },
   "devDependencies": {
+    "adm-zip": "^0.5.16",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^20.14.0",

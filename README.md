@@ -73,13 +73,20 @@ cd apps/web
 npm run dev
 ```
 
-### 4. Load Chrome extension
+### 4. Install the Chrome extension
+
+Easiest: open the **Dashboard** in the web app and click **Download extension** —
+you get `jobpilot-extension.zip`. Unzip it, open `chrome://extensions`, enable
+**Developer mode**, click **Load unpacked**, and select the unzipped folder.
+
+To rebuild the zip after changing extension code:
 
 ```powershell
 npm run build:extension
 ```
 
-Load unpacked from `apps/autofill-extension/extension/` in Chrome.
+This bundles the extension and refreshes `apps/web/public/jobpilot-extension.zip`
+(you can also load `apps/autofill-extension/extension/` unpacked directly).
 
 ## User journey
 

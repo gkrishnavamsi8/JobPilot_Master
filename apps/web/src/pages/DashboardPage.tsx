@@ -3,7 +3,7 @@ import {
   Briefcase,
   CheckCircle2,
   Chrome,
-  ClipboardList,
+  Download,
   Eye,
   FileText,
   Send,
@@ -84,7 +84,7 @@ export function DashboardPage() {
       text: 'Match overlay + form autofill on Workday & Greenhouse.',
       done: false,
       to: null,
-      cta: 'Load from apps/autofill-extension/extension',
+      cta: 'Download it below',
     },
   ];
 
@@ -225,24 +225,51 @@ export function DashboardPage() {
         })}
       </div>
 
-      {/* Extension hint */}
+      {/* Extension download */}
       <div
-        className="card mt-6 flex flex-wrap items-center justify-between gap-4 border-brand-500/20 bg-gradient-to-r from-brand-900/40 to-panel p-6 animate-fade-up"
+        className="card mt-6 border-brand-500/20 bg-gradient-to-r from-brand-900/40 to-panel p-6 animate-fade-up"
         style={{ animationDelay: '540ms' }}
       >
-        <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-accent-500 text-white">
-            <ClipboardList className="h-6 w-6" />
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-accent-500 text-white">
+              <Chrome className="h-6 w-6" />
+            </div>
+            <div>
+              <h4 className="font-semibold text-white">Chrome extension completes the loop</h4>
+              <p className="mt-0.5 text-sm text-ink-2">
+                Match overlay + one-click autofill on Workday & Greenhouse apply pages.
+              </p>
+            </div>
           </div>
-          <div>
-            <h4 className="font-semibold text-white">Chrome extension completes the loop</h4>
-            <p className="mt-0.5 text-sm text-ink-2">
-              Build it with <code className="rounded bg-panel-2 px-1.5 py-0.5 text-xs">npm run build:extension</code>,
-              then load <code className="rounded bg-panel-2 px-1.5 py-0.5 text-xs">apps/autofill-extension/extension</code> unpacked
-              — it shows the match overlay and autofills applications.
-            </p>
-          </div>
+          <a href="/jobpilot-extension.zip" download className="btn-primary">
+            <Download className="h-4 w-4" />
+            Download extension
+          </a>
         </div>
+        <ol className="mt-4 grid gap-2 border-t border-panel-border pt-4 text-sm text-ink-2 sm:grid-cols-2 lg:grid-cols-4">
+          <li className="flex items-start gap-2">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-[11px] font-bold text-brand-300">1</span>
+            Unzip the download
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-[11px] font-bold text-brand-300">2</span>
+            <span>
+              Open <code className="rounded bg-panel-2 px-1 py-0.5 text-xs">chrome://extensions</code> and
+              turn on <strong className="text-ink">Developer mode</strong>
+            </span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-[11px] font-bold text-brand-300">3</span>
+            <span>
+              Click <strong className="text-ink">Load unpacked</strong> and select the unzipped folder
+            </span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-[11px] font-bold text-brand-300">4</span>
+            Open a job apply page — the match overlay appears
+          </li>
+        </ol>
       </div>
     </main>
   );
