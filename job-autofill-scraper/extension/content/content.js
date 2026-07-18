@@ -1,4 +1,539 @@
 (() => {
+  // ../packages/match-core/src/data/skillAliases.json
+  var skillAliases_default = {
+    JavaScript: ["JS", "Javascript", "ECMAScript", "ES6", "ES2015"],
+    TypeScript: ["TS"],
+    "Node.js": ["NodeJS", "Node JS"],
+    React: ["ReactJS", "React.js", "React JS"],
+    Angular: ["AngularJS", "Angular JS"],
+    Vue: ["VueJS", "Vue.js", "Vue JS"],
+    "Next.js": ["NextJS", "Next JS"],
+    Kubernetes: ["K8s", "k8s", "Kube"],
+    Docker: ["Containerization", "Containers"],
+    AWS: ["Amazon Web Services", "Amazon AWS"],
+    GCP: ["Google Cloud Platform", "Google Cloud"],
+    Azure: ["Microsoft Azure", "MS Azure"],
+    PostgreSQL: ["Postgres", "PSQL", "Postgresql"],
+    MySQL: ["My SQL"],
+    MongoDB: ["Mongo"],
+    Elasticsearch: ["Elastic Search", "ELK"],
+    Kafka: ["Apache Kafka"],
+    RabbitMQ: ["Rabbit MQ"],
+    GraphQL: ["GQL"],
+    "REST API": ["REST", "RESTful", "RESTful API", "REST APIs"],
+    "CI/CD": ["CICD", "CI CD", "Continuous Integration", "Continuous Delivery"],
+    "GitHub Actions": ["Github Actions", "GH Actions"],
+    "Machine Learning": ["ML"],
+    "Deep Learning": ["DL"],
+    LLM: ["Large Language Model", "Large Language Models", "GenAI", "Generative AI"],
+    RAG: ["Retrieval Augmented Generation"],
+    NLP: ["Natural Language Processing"],
+    TensorFlow: ["TF"],
+    PyTorch: ["Torch"],
+    "Scikit-learn": ["Sklearn", "Scikit Learn"],
+    "Spring Boot": ["SpringBoot", "Spring-Boot"],
+    FastAPI: ["Fast API"],
+    Go: ["Golang", "Go Lang"],
+    "C#": ["C Sharp", "CSharp"],
+    "C++": ["Cpp", "C Plus Plus"],
+    SQL: ["Structured Query Language"],
+    NoSQL: ["No SQL"],
+    Terraform: ["IaC", "Infrastructure as Code"],
+    Ansible: ["Red Hat Ansible"],
+    Linux: ["Unix", "UNIX"],
+    Shell: ["Shell Scripting", "Shell Script"],
+    Bash: ["Bourne Again Shell"],
+    JUnit: ["J Unit"],
+    Pytest: ["Py Test"],
+    OAuth2: ["OAuth 2", "OAuth 2.0"],
+    OAuth: ["Open Authorization"],
+    JWT: ["JSON Web Token", "JSON Web Tokens"],
+    Microservices: ["Microservice", "Micro Services"],
+    "Microservices Architecture": ["Microservice Architecture"],
+    "Event-Driven Architecture": ["EDA", "Event Driven Architecture"],
+    "Domain-Driven Design": ["DDD"],
+    TDD: ["Test-Driven Development", "Test Driven Development"],
+    "Tailwind CSS": ["TailwindCSS", "Tailwind"],
+    SASS: ["SCSS"],
+    "Apache Camel": ["Camel"],
+    "Power BI": ["PowerBI"],
+    ServiceNow: ["Service Now"],
+    MuleSoft: ["Mule Soft"],
+    "SQL Server": ["MSSQL", "MS SQL", "Microsoft SQL Server"],
+    Oracle: ["Oracle DB", "Oracle Database"],
+    Helm: ["Helm Charts"],
+    ArgoCD: ["Argo CD", "Argo"],
+    Lambda: ["AWS Lambda"],
+    EC2: ["Amazon EC2", "AWS EC2"],
+    S3: ["Amazon S3", "AWS S3"],
+    RDS: ["Amazon RDS", "AWS RDS"],
+    DynamoDB: ["Dynamo DB"],
+    SQS: ["Amazon SQS", "AWS SQS"],
+    SNS: ["Amazon SNS", "AWS SNS"],
+    CloudFormation: ["CFN", "Cloud Formation"],
+    "API Gateway": ["APIGW", "API GW"],
+    "Service Mesh": ["Service-Mesh"],
+    "System Design": ["Systems Design"],
+    "Distributed Systems": ["Distributed System"],
+    "A/B Testing": ["AB Testing", "Split Testing"],
+    "Business Intelligence": ["BI"],
+    "Data Warehousing": ["Data Warehouse"],
+    "Penetration Testing": ["Pen Testing", "Pentesting"],
+    "Zero Trust": ["Zero-Trust"],
+    "SSL/TLS": ["TLS", "SSL"],
+    IAM: ["Identity and Access Management"],
+    HIPAA: ["HIPAA Compliance"],
+    "PCI DSS": ["PCI"],
+    "Product Management": ["Product Manager"],
+    "Cross-functional Collaboration": ["Cross functional Collaboration"],
+    "Pair Programming": ["Pair-Programming"]
+  };
+
+  // ../packages/match-core/src/data/skillsTaxonomy.json
+  var skillsTaxonomy_default = [
+    "Java",
+    "Python",
+    "JavaScript",
+    "TypeScript",
+    "C#",
+    "C++",
+    "Go",
+    "Rust",
+    "Ruby",
+    "PHP",
+    "Swift",
+    "Kotlin",
+    "Scala",
+    "Spring Boot",
+    "Spring",
+    "Django",
+    "Flask",
+    "FastAPI",
+    "Node.js",
+    "Express",
+    "React",
+    "Angular",
+    "Vue",
+    "Next.js",
+    "HTML",
+    "CSS",
+    "SQL",
+    "NoSQL",
+    "PostgreSQL",
+    "MySQL",
+    "MongoDB",
+    "Redis",
+    "Elasticsearch",
+    "Kafka",
+    "RabbitMQ",
+    "Docker",
+    "Kubernetes",
+    "AWS",
+    "GCP",
+    "Azure",
+    "Terraform",
+    "Ansible",
+    "Jenkins",
+    "Git",
+    "GitHub Actions",
+    "CI/CD",
+    "Microservices",
+    "REST API",
+    "GraphQL",
+    "gRPC",
+    "Machine Learning",
+    "Deep Learning",
+    "TensorFlow",
+    "PyTorch",
+    "Scikit-learn",
+    "LLM",
+    "RAG",
+    "NLP",
+    "Computer Vision",
+    "Data Engineering",
+    "Spark",
+    "Hadoop",
+    "Airflow",
+    "dbt",
+    "Snowflake",
+    "Databricks",
+    "Power BI",
+    "Tableau",
+    "Agile",
+    "Scrum",
+    "DevOps",
+    "Linux",
+    "Bash",
+    "Shell",
+    "JUnit",
+    "Pytest",
+    "Selenium",
+    "Playwright",
+    "Cypress",
+    "OAuth",
+    "JWT",
+    "OAuth2",
+    "Microservices Architecture",
+    "System Design",
+    "Distributed Systems",
+    "Event-Driven Architecture",
+    "CQRS",
+    "Domain-Driven Design",
+    "TDD",
+    "SOLID",
+    "Design Patterns",
+    "Hibernate",
+    "JPA",
+    "Maven",
+    "Gradle",
+    "npm",
+    "Webpack",
+    "Vite",
+    "Tailwind CSS",
+    "Bootstrap",
+    "SASS",
+    "Figma",
+    "Jira",
+    "Confluence",
+    "Splunk",
+    "Datadog",
+    "Prometheus",
+    "Grafana",
+    "Helm",
+    "ArgoCD",
+    "Istio",
+    "Service Mesh",
+    "API Gateway",
+    "Lambda",
+    "EC2",
+    "S3",
+    "RDS",
+    "DynamoDB",
+    "SQS",
+    "SNS",
+    "CloudFormation",
+    "Pulumi",
+    "OpenShift",
+    "Nginx",
+    "Apache",
+    "Tomcat",
+    "WebLogic",
+    "Oracle",
+    "SQL Server",
+    "SQLite",
+    "Cassandra",
+    "Neo4j",
+    "InfluxDB",
+    "Pandas",
+    "NumPy",
+    "Matplotlib",
+    "Seaborn",
+    "Jupyter",
+    "MLOps",
+    "Feature Engineering",
+    "A/B Testing",
+    "Statistics",
+    "Probability",
+    "Linear Algebra",
+    "ETL",
+    "Data Warehousing",
+    "Data Modeling",
+    "Business Intelligence",
+    "SAP",
+    "Salesforce",
+    "ServiceNow",
+    "MuleSoft",
+    "Apache Camel",
+    "ActiveMQ",
+    "IBM MQ",
+    "WebSphere",
+    "COBOL",
+    "Mainframe",
+    "Blockchain",
+    "Solidity",
+    "Web3",
+    "IoT",
+    "Embedded Systems",
+    "RTOS",
+    "FPGA",
+    "Verilog",
+    "VHDL",
+    "MATLAB",
+    "Simulink",
+    "AutoCAD",
+    "Unity",
+    "Unreal Engine",
+    "Game Development",
+    "Cybersecurity",
+    "Penetration Testing",
+    "SIEM",
+    "SOC",
+    "Zero Trust",
+    "IAM",
+    "PKI",
+    "SSL/TLS",
+    "HIPAA",
+    "PCI DSS",
+    "GDPR",
+    "SOX",
+    "ITIL",
+    "TOGAF",
+    "SAFe",
+    "Kanban",
+    "Product Management",
+    "Technical Writing",
+    "Stakeholder Management",
+    "Cross-functional Collaboration",
+    "Problem Solving",
+    "Communication",
+    "Leadership",
+    "Mentoring",
+    "Code Review",
+    "Pair Programming"
+  ];
+
+  // ../packages/match-core/src/skillsTaxonomy.ts
+  var SKILLS_TAXONOMY = skillsTaxonomy_default;
+  function getSkillsTaxonomy() {
+    return SKILLS_TAXONOMY;
+  }
+
+  // ../packages/match-core/src/skillAliases.ts
+  var cachedAliasMap = null;
+  function buildValidatedAliasMap() {
+    const taxonomySet = new Set(SKILLS_TAXONOMY);
+    const validated = {};
+    for (const [skill, aliases] of Object.entries(skillAliases_default)) {
+      if (!taxonomySet.has(skill)) {
+        continue;
+      }
+      validated[skill] = aliases.filter(
+        (alias) => alias.trim().length > 0 && alias.toLowerCase() !== skill.toLowerCase()
+      );
+    }
+    return validated;
+  }
+  function getSkillAliasMap() {
+    if (!cachedAliasMap) {
+      cachedAliasMap = buildValidatedAliasMap();
+    }
+    return cachedAliasMap;
+  }
+  function getSearchTermsForSkill(skill, aliasMap = getSkillAliasMap()) {
+    const aliases = aliasMap[skill] ?? [];
+    return [skill, ...aliases].sort((a, b) => b.length - a.length);
+  }
+
+  // ../packages/match-core/src/skillExtractor.ts
+  function escapeRegex(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+  function buildSkillPattern(term) {
+    const escaped = escapeRegex(term);
+    return new RegExp(`\\b${escaped}\\b`, "i");
+  }
+  function termMatchesText(term, text) {
+    return buildSkillPattern(term).test(text);
+  }
+  function filterSubsumedSkills(skills) {
+    const sorted = [...skills].sort((a, b) => b.length - a.length);
+    const kept = [];
+    for (const skill of sorted) {
+      const subsumed = kept.some((longer) => termMatchesText(skill, longer));
+      if (!subsumed) {
+        kept.push(skill);
+      }
+    }
+    return new Set(kept);
+  }
+  function skillMentionedInText(skill, text, aliasMap) {
+    const searchTerms = getSearchTermsForSkill(skill, aliasMap);
+    return searchTerms.some((term) => termMatchesText(term, text));
+  }
+  function extractSkills(text, taxonomy2, aliasMap = getSkillAliasMap()) {
+    if (!text.trim()) {
+      return /* @__PURE__ */ new Set();
+    }
+    const sortedTaxonomy = [...taxonomy2].sort((a, b) => b.length - a.length);
+    const found = /* @__PURE__ */ new Set();
+    for (const skill of sortedTaxonomy) {
+      if (skillMentionedInText(skill, text, aliasMap)) {
+        found.add(skill);
+      }
+    }
+    return filterSubsumedSkills(found);
+  }
+
+  // ../packages/match-core/src/matchScorer.ts
+  var REQUIRED_SECTION_PATTERN = /(?:^|\n)\s*(?:required|must[\s-]*have|minimum\s+qualifications|basic\s+qualifications|essential)[^\n]*\n([\s\S]*?)(?=(?:^|\n)\s*(?:nice\s+to\s+have|preferred|bonus|desired|optional|qualifications)[^\n]*\n|$)/gi;
+  var PREFERRED_SECTION_PATTERN = /(?:^|\n)\s*(?:nice\s+to\s+have|preferred|bonus|desired|optional)[^\n]*\n([\s\S]*?)(?=(?:^|\n)\s*(?:required|must[\s-]*have|minimum\s+qualifications|responsibilities|about)[^\n]*\n|$)/gi;
+  function sortSkills(skills) {
+    return [...skills].sort((a, b) => a.localeCompare(b));
+  }
+  function roundScore(value) {
+    return Math.round(value * 10) / 10;
+  }
+  function computeMatchScore(userSkills, jdSkills) {
+    if (jdSkills.size === 0) {
+      return {
+        score: 0,
+        matchedSkills: [],
+        missingSkills: []
+      };
+    }
+    const matched = sortSkills([...jdSkills].filter((skill) => userSkills.has(skill)));
+    const missing = sortSkills([...jdSkills].filter((skill) => !userSkills.has(skill)));
+    const score = roundScore(matched.length / jdSkills.size * 100);
+    return {
+      score,
+      matchedSkills: matched,
+      missingSkills: missing
+    };
+  }
+  function extractSectionText(jdText, pattern) {
+    const sections = [];
+    const regex = new RegExp(pattern.source, pattern.flags);
+    let match;
+    while ((match = regex.exec(jdText)) !== null) {
+      if (match[1]?.trim()) {
+        sections.push(match[1]);
+      }
+    }
+    return sections.join("\n");
+  }
+  function splitJdSkillSections(requiredSkills, preferredSkills, allJdSkills) {
+    const requiredOnly = /* @__PURE__ */ new Set();
+    const preferredOnly = /* @__PURE__ */ new Set();
+    const other = /* @__PURE__ */ new Set();
+    for (const skill of allJdSkills) {
+      const inRequired = requiredSkills.has(skill);
+      const inPreferred = preferredSkills.has(skill);
+      if (inRequired) {
+        requiredOnly.add(skill);
+      } else if (inPreferred) {
+        preferredOnly.add(skill);
+      } else {
+        other.add(skill);
+      }
+    }
+    return {
+      requiredSkills: requiredOnly,
+      preferredSkills: preferredOnly,
+      otherSkills: other
+    };
+  }
+  function computeWeightedMatchScore(userSkills, requiredSkills, preferredSkills, allJdSkills, requiredWeight = 2, preferredWeight = 1) {
+    const sections = splitJdSkillSections(requiredSkills, preferredSkills, allJdSkills);
+    const basic = computeMatchScore(userSkills, allJdSkills);
+    const requiredMatched = sortSkills(
+      [...sections.requiredSkills].filter((skill) => userSkills.has(skill))
+    );
+    const requiredMissing = sortSkills(
+      [...sections.requiredSkills].filter((skill) => !userSkills.has(skill))
+    );
+    const preferredMatched = sortSkills(
+      [...sections.preferredSkills].filter((skill) => userSkills.has(skill))
+    );
+    const preferredMissing = sortSkills(
+      [...sections.preferredSkills].filter((skill) => !userSkills.has(skill))
+    );
+    const totalWeight = sections.requiredSkills.size * requiredWeight + sections.preferredSkills.size * preferredWeight + sections.otherSkills.size * preferredWeight;
+    if (totalWeight === 0) {
+      return {
+        ...basic,
+        weightedScore: 0,
+        requiredMatched,
+        requiredMissing,
+        preferredMatched,
+        preferredMissing
+      };
+    }
+    const earnedWeight = requiredMatched.length * requiredWeight + preferredMatched.length * preferredWeight + sortSkills([...sections.otherSkills].filter((skill) => userSkills.has(skill))).length * preferredWeight;
+    return {
+      ...basic,
+      weightedScore: roundScore(earnedWeight / totalWeight * 100),
+      requiredMatched,
+      requiredMissing,
+      preferredMatched,
+      preferredMissing
+    };
+  }
+  function getJdSectionTexts(jdText) {
+    return {
+      requiredText: extractSectionText(jdText, REQUIRED_SECTION_PATTERN),
+      preferredText: extractSectionText(jdText, PREFERRED_SECTION_PATTERN)
+    };
+  }
+
+  // ../packages/match-core/src/jdMatchService.ts
+  var taxonomy = getSkillsTaxonomy();
+  function analyzeMatch(input) {
+    const userSkills = extractSkills(input.professionalSummary, taxonomy);
+    const jdSkills = extractSkills(input.jobDescription, taxonomy);
+    const result = computeMatchScore(userSkills, jdSkills);
+    let weightedResult;
+    if (input.useWeightedScoring) {
+      const { requiredText, preferredText } = getJdSectionTexts(input.jobDescription);
+      const requiredSkills = extractSkills(requiredText, taxonomy);
+      const preferredSkills = extractSkills(preferredText, taxonomy);
+      weightedResult = computeWeightedMatchScore(
+        userSkills,
+        requiredSkills,
+        preferredSkills,
+        jdSkills
+      );
+    }
+    return {
+      userSkillCount: userSkills.size,
+      jdSkillCount: jdSkills.size,
+      userSkills: [...userSkills].sort((a, b) => a.localeCompare(b)),
+      jdSkills: [...jdSkills].sort((a, b) => a.localeCompare(b)),
+      result,
+      weightedResult
+    };
+  }
+
+  // ../packages/shared-types/src/matchText.ts
+  function buildUserMatchText2(candidate) {
+    const parts = [];
+    if (candidate.profile?.summary?.trim()) {
+      parts.push(candidate.profile.summary.trim());
+    }
+    if (candidate.profile?.skills?.length) {
+      parts.push(candidate.profile.skills.join(", "));
+    }
+    for (const role of candidate.work_experience ?? []) {
+      const chunk = `${role.title ?? ""} ${role.description ?? ""}`.trim();
+      if (chunk) {
+        parts.push(chunk);
+      }
+    }
+    for (const edu of candidate.education ?? []) {
+      const chunk = `${edu.degree ?? ""} ${edu.field_of_study ?? ""}`.trim();
+      if (chunk) {
+        parts.push(chunk);
+      }
+    }
+    if (candidate.cover_letter?.trim()) {
+      parts.push(candidate.cover_letter.trim());
+    }
+    return parts.join("\n");
+  }
+
+  // ../packages/shared-types/src/jobKey.ts
+  function parseJobKey(key) {
+    const parts = key.split(":");
+    if (parts.length < 3) {
+      return null;
+    }
+    const [companyId, source, ...rest] = parts;
+    return {
+      companyId,
+      source,
+      jobId: rest.join(":")
+    };
+  }
+
   // shared/dist/utils.js
   function getValueAtPath(data, path) {
     if (!path)
@@ -37,12 +572,22 @@
   function normalizeLabelText(text) {
     return normalizeText(text).replace(/\*/g, "").replace(/\(required\)/g, "").replace(/\s+/g, " ").trim();
   }
+  function shouldRejectPhoneNumberMapping(mapping, hintText) {
+    if (mapping.jsonPath !== "profile.phone.number") return false;
+    const hint = normalizeLabelText(hintText);
+    if (!hint) return false;
+    if (/device\s*type|phone\s*type|type\s*of\s*phone/i.test(hint)) return true;
+    if (/country\s*phone\s*code|phone\s*country\s*code/i.test(hint)) return true;
+    if (/country.*code|phone.*country|phone_country/i.test(hint)) return true;
+    return false;
+  }
   function findMappingByLabel(labelText, mappings) {
     const normalized = normalizeLabelText(labelText);
     if (!normalized) return void 0;
     let best;
     for (const mapping of mappings) {
       if (!mapping.labelSynonyms?.length) continue;
+      if (shouldRejectPhoneNumberMapping(mapping, labelText)) continue;
       for (const synonym of mapping.labelSynonyms) {
         const s = normalizeLabelText(synonym);
         if (!s) continue;
@@ -78,7 +623,9 @@
       if (mapping.labelSynonyms?.some((s) => matchesPattern(ariaLabel, s))) score += 25;
       if (mapping.labelSynonyms?.some((s) => matchesPattern(placeholder, s))) score += 15;
       if (matchesPattern(autocomplete, mapping.namePattern)) score += 20;
-      if (mapping.jsonPath === "profile.phone.number" && /country.*code|phone.*country|phone_country/i.test(`${name} ${id} ${ariaLabel}`)) {
+      const hintText = `${name} ${id} ${ariaLabel} ${placeholder}`;
+      if (shouldRejectPhoneNumberMapping(mapping, hintText)) continue;
+      if (mapping.jsonPath === "profile.phone.number" && /country.*code|phone.*country|phone_country/i.test(hintText)) {
         continue;
       }
       if (score > 0 && (!best || score > best.score)) {
@@ -92,7 +639,7 @@
     for (const hint of hints) {
       if (!hint.trim()) continue;
       const byLabel = findMappingByLabel(hint, mappings);
-      if (byLabel) {
+      if (byLabel && !shouldRejectPhoneNumberMapping(byLabel, hint)) {
         const score = 50 + hint.length;
         if (!best || score > best.score) best = { mapping: byLabel, score };
       }
@@ -137,7 +684,9 @@
     if (wrappingLabel) push(wrappingLabel.textContent);
     const container = element.closest(FIELD_CONTAINER_SELECTOR);
     if (container) {
-      const labelEl = container.querySelector(":scope > label, :scope > legend, :scope > .label");
+      const labelEl = container.querySelector(
+        ':scope > label, :scope > legend, :scope > .label, :scope [class*="label"], :scope [class*="Label"], :scope .text'
+      );
       if (labelEl && !labelEl.contains(element)) {
         push(labelEl.textContent);
       }
@@ -288,6 +837,86 @@
     fieldType: "textarea"
   };
 
+  // scraper/src/adapters/universal/resolve-field-value.ts
+  function isCountryPhoneCodeMapping(mapping) {
+    return mapping.labelSynonyms?.some(
+      (synonym) => /country phone code|phone country code/i.test(synonym)
+    ) ?? false;
+  }
+  function isPhoneDeviceTypeMapping(mapping) {
+    return mapping.jsonPath === "profile.phone.type";
+  }
+  function extractDialCodeFromPhoneNumber(phoneNumber) {
+    const trimmed = phoneNumber.trim();
+    if (!trimmed.startsWith("+")) return void 0;
+    const match = trimmed.match(/^\+(\d{1,3})/);
+    return match?.[1];
+  }
+  function getCountryPhoneCodeSearchTerms(candidateData) {
+    const profile = candidateData?.profile;
+    const address = profile?.address;
+    const phone = profile?.phone;
+    const country = String(address?.country ?? "").trim();
+    const phoneNumber = String(phone?.number ?? "").trim();
+    const explicitCode = String(phone?.country_code ?? "").trim();
+    const terms = [];
+    if (country) terms.push(country);
+    const dialCode = (explicitCode ? explicitCode.replace(/\D/g, "") : void 0) ?? extractDialCodeFromPhoneNumber(phoneNumber);
+    if (dialCode) {
+      terms.push(`+${dialCode}`);
+      terms.push(`(${dialCode})`);
+    }
+    return [...new Set(terms.filter(Boolean))];
+  }
+  function normalizePhoneTypeValue(value) {
+    const raw = String(value ?? "mobile").trim().toLowerCase();
+    if (!raw) return "Mobile";
+    if (raw === "mobile" || raw === "cell" || raw === "cellphone") return "Mobile";
+    if (raw === "home") return "Home";
+    if (raw === "work" || raw === "office") return "Work";
+    return raw.charAt(0).toUpperCase() + raw.slice(1);
+  }
+  function resolveFieldValue(mapping, candidateData) {
+    const raw = getValueAtPath(candidateData, mapping.jsonPath);
+    if (mapping.jsonPath === "profile.phone.number") {
+      return formatPhoneForField(raw, candidateData);
+    }
+    if (isPhoneDeviceTypeMapping(mapping)) {
+      return normalizePhoneTypeValue(raw);
+    }
+    if (isCountryPhoneCodeMapping(mapping)) {
+      const terms = getCountryPhoneCodeSearchTerms(candidateData);
+      return terms[0] ?? raw;
+    }
+    return raw;
+  }
+  function getDropdownSearchTerms(mapping, candidateData, primaryValue) {
+    const primary = String(primaryValue ?? "").trim();
+    const terms = primary ? [primary] : [];
+    if (isCountryPhoneCodeMapping(mapping)) {
+      for (const term of getCountryPhoneCodeSearchTerms(candidateData)) {
+        if (!terms.includes(term)) terms.push(term);
+      }
+    }
+    if (mapping.jsonPath === "profile.address.country" && !isCountryPhoneCodeMapping(mapping)) {
+      const normalized = primary.toLowerCase();
+      if (normalized === "united states" || normalized === "usa" || normalized === "us") {
+        terms.push("United States of America", "United States", "USA");
+      }
+      if (normalized === "india") {
+        terms.push("India");
+      }
+      if (normalized === "united kingdom" || normalized === "uk") {
+        terms.push("United Kingdom", "UK");
+      }
+    }
+    if (isPhoneDeviceTypeMapping(mapping)) {
+      const normalized = normalizePhoneTypeValue(primary);
+      terms.push(normalized, `${normalized} Phone`, normalized.toLowerCase());
+    }
+    return [...new Set(terms.filter(Boolean))];
+  }
+
   // scraper/src/fill-engine/dom-utils.ts
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -311,7 +940,14 @@
     if (a.startsWith(`${b} `) || a.startsWith(`${b}(`) || a.startsWith(`${b},`)) return true;
     return containsWholeWord(a, b);
   }
-  function findBestMatchingOption(options, desired) {
+  function findBestMatchingOptionFromTerms(options, desiredTerms) {
+    for (const desired of desiredTerms) {
+      const match = findBestMatchingOptionSingle(options, desired);
+      if (match) return match;
+    }
+    return void 0;
+  }
+  function findBestMatchingOptionSingle(options, desired) {
     const desiredNorm = normalizeMatchText(desired);
     if (!desiredNorm) return void 0;
     let best;
@@ -323,6 +959,8 @@
       if (norm === desiredNorm) score = 100;
       else if (norm.startsWith(`${desiredNorm} `) || norm.startsWith(`${desiredNorm}(`)) score = 90;
       else if (containsWholeWord(norm, desiredNorm)) score = 70;
+      else if (desiredNorm.startsWith("+") && norm.includes(desiredNorm)) score = 88;
+      else if (desiredNorm.startsWith("(") && norm.includes(desiredNorm)) score = 88;
       else if (desiredNorm.length >= 5 && norm.includes(desiredNorm)) score = 30;
       if (score > 0 && (!best || score > best.score)) {
         best = { element: opt, score };
@@ -437,12 +1075,18 @@
 
   // scraper/src/fill-engine/handlers/dropdown.ts
   async function fillNativeSelect(select, value, mapping, context) {
-    const desired = normalizeMatchText(value);
+    const searchTerms = getDropdownSearchTerms(mapping, context.candidateData, value);
     const optionElements = Array.from(select.options);
     let matched;
-    const matchedEl = findBestMatchingOption(optionElements, desired);
-    if (matchedEl instanceof HTMLOptionElement) matched = matchedEl;
+    for (const term of searchTerms) {
+      const matchedEl = findBestMatchingOptionFromTerms(optionElements, [term]);
+      if (matchedEl instanceof HTMLOptionElement) {
+        matched = matchedEl;
+        break;
+      }
+    }
     if (!matched) {
+      const desired = normalizeMatchText(value);
       for (const option of optionElements) {
         if (normalizeMatchText(option.value) === desired) {
           matched = option;
@@ -491,7 +1135,8 @@
     }
     const searchRoot = container.ownerDocument?.body ?? container;
     const options = await waitForVisibleOptions(searchRoot);
-    const match = findBestMatchingOption(options, value);
+    const searchTerms = getDropdownSearchTerms(mapping, context.candidateData, value);
+    const match = findBestMatchingOptionFromTerms(options, searchTerms);
     if (!match) {
       return {
         success: false,
@@ -532,7 +1177,8 @@
         message: "Dropdown options did not appear"
       };
     }
-    const match = findBestMatchingOption(options, value);
+    const searchTerms = getDropdownSearchTerms(mapping, context.candidateData, value);
+    const match = findBestMatchingOptionFromTerms(options, searchTerms);
     if (!match) {
       return {
         success: false,
@@ -862,6 +1508,13 @@
       fieldType: "text"
     },
     {
+      labelSynonyms: ["phone device type", "phone type", "device type", "type of phone"],
+      namePattern: /phone.*device|device.*type|phone_type|phonetype/i,
+      idPattern: /phone.*device|device.*type|phone_type/i,
+      jsonPath: "profile.phone.type",
+      fieldType: "dropdown"
+    },
+    {
       labelSynonyms: ["phone number", "phone"],
       namePattern: /(?:^|\[)(?:phone[_-]?number|phone)(?:\]|$)/i,
       idPattern: /^phone(?:[_-]?number)?$/i,
@@ -876,7 +1529,7 @@
       fieldType: "dropdown"
     },
     {
-      labelSynonyms: ["country"],
+      labelSynonyms: ["country", "country/region", "country or region", "country region"],
       namePattern: /(?:^|\[)country(?:\]|$)|^country$/i,
       idPattern: /^country$/i,
       automationIdPattern: /^country$/i,
@@ -1044,7 +1697,7 @@
     const resolvedMapping = { ...mapping, fieldType };
     const target = resolveFillElement(element, fieldType);
     if (!target || seen.has(target)) return;
-    const value = getValueAtPath(candidateData, mapping.jsonPath);
+    const value = resolveFieldValue(resolvedMapping, candidateData);
     if (isEmptyValue(value) && fieldType !== "file" && fieldType !== "checkbox") return;
     seen.add(target);
     results.push({ element: target, automationId: key, mapping: resolvedMapping, value });
@@ -1074,6 +1727,7 @@
     const hints = collectFieldHints(element);
     const mapping = findMappingByAttributes(element, mappings) ?? findBestMapping(hints, mappings);
     if (!mapping) return;
+    if (hints.some((hint) => shouldRejectPhoneNumberMapping(mapping, hint))) return;
     addScannedField(
       results,
       seen,
@@ -1148,17 +1802,20 @@
     log(`Scanning page (${hostname || "unknown host"})`);
     let scanned = scanWithFallback(document2, candidateData, config);
     const fillOrder = {
-      text: 0,
-      textarea: 1,
-      dropdown: 2,
+      dropdown: 0,
+      text: 1,
+      textarea: 2,
       multiselect: 3,
       checkbox: 4,
       repeatable: 5,
       file: 6
     };
-    scanned.sort(
-      (a, b) => (fillOrder[a.mapping.fieldType] ?? 9) - (fillOrder[b.mapping.fieldType] ?? 9)
-    );
+    scanned.sort((a, b) => {
+      const typeOrder = (fillOrder[a.mapping.fieldType] ?? 9) - (fillOrder[b.mapping.fieldType] ?? 9);
+      if (typeOrder !== 0) return typeOrder;
+      const countryPriority = (field) => field.mapping.jsonPath === "profile.address.country" ? 0 : 1;
+      return countryPriority(a) - countryPriority(b);
+    });
     const repeatable = scanned.filter((f) => f.mapping.fieldType === "repeatable");
     const flat = scanned.filter((f) => f.mapping.fieldType !== "repeatable");
     scanned = [...repeatable, ...flat];
@@ -1202,9 +1859,586 @@
   }
 
   // extension/src/content.ts
+  var DEFAULT_API = "http://127.0.0.1:3001";
+  var DEFAULT_SCRAPER = "http://127.0.0.1:8000";
+  var API_CACHE_KEY = "apiCandidateCache";
+  var LOCAL_CANDIDATE_ID_KEY = "jobpilotCandidateId";
+  var overlayInFlight = false;
+  var lastOverlayAt = 0;
+  var domRetryCount = 0;
+  var MAX_DOM_RETRIES = 3;
+  async function getSettings() {
+    const [syncStored, localStored] = await Promise.all([
+      chrome.storage.sync.get(["apiBaseUrl", "scraperBaseUrl", "apiKey", "candidateId"]),
+      chrome.storage.local.get([LOCAL_CANDIDATE_ID_KEY])
+    ]);
+    return {
+      apiBaseUrl: syncStored.apiBaseUrl || DEFAULT_API,
+      scraperBaseUrl: syncStored.scraperBaseUrl || DEFAULT_SCRAPER,
+      apiKey: syncStored.apiKey || "",
+      candidateId: localStored[LOCAL_CANDIDATE_ID_KEY] || syncStored.candidateId || ""
+    };
+  }
+  function readContextFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const candidateId = params.get("jp_candidate");
+    if (!candidateId) {
+      return null;
+    }
+    return {
+      candidateId,
+      jobKey: params.get("jp_job") ?? void 0
+    };
+  }
+  async function persistCandidateId(candidateId) {
+    const stored = await chrome.storage.local.get(LOCAL_CANDIDATE_ID_KEY);
+    if (stored[LOCAL_CANDIDATE_ID_KEY] === candidateId) {
+      return;
+    }
+    await chrome.storage.local.set({ [LOCAL_CANDIDATE_ID_KEY]: candidateId });
+  }
+  async function persistProfileCache(candidateId, data) {
+    const lookupKey = `frontend:${candidateId}`;
+    const stored = await chrome.storage.local.get(API_CACHE_KEY);
+    const cache = stored[API_CACHE_KEY];
+    if (cache?.lookupKey === lookupKey && cache?.data) {
+      return;
+    }
+    await chrome.storage.local.set({
+      [API_CACHE_KEY]: {
+        data,
+        lookupKey,
+        fetchedAt: (/* @__PURE__ */ new Date()).toISOString()
+      }
+    });
+  }
+  async function readCachedCandidate() {
+    const stored = await chrome.storage.local.get(API_CACHE_KEY);
+    const cache = stored[API_CACHE_KEY];
+    if (cache?.data && typeof cache.data === "object") {
+      return cache.data;
+    }
+    return null;
+  }
+  async function resolveCandidate(settings, context) {
+    const cached = await readCachedCandidate();
+    if (cached) {
+      return cached;
+    }
+    const candidateId = context.candidateId || settings.candidateId;
+    if (!candidateId) {
+      throw new Error("Save your profile on JobPilot or fetch it from the extension popup first.");
+    }
+    return fetchCandidate(settings.apiBaseUrl, settings.apiKey, candidateId);
+  }
+  async function fetchCandidate(apiBaseUrl, apiKey, candidateId) {
+    const headers = {};
+    if (apiKey) {
+      headers["x-api-key"] = apiKey;
+    }
+    const res = await fetch(`${apiBaseUrl}/candidates/${candidateId}`, { headers });
+    if (!res.ok) {
+      throw new Error("Could not load candidate profile for match scoring.");
+    }
+    const payload = await res.json();
+    return payload.data;
+  }
+  async function fetchJobByKey(scraperBaseUrl, jobKey) {
+    const parsed = parseJobKey(jobKey);
+    if (!parsed) {
+      return null;
+    }
+    const query = new URLSearchParams({
+      company_id: parsed.companyId,
+      source: parsed.source,
+      job_id: parsed.jobId
+    });
+    const res = await fetch(`${scraperBaseUrl}/api/jobs/by-key?${query.toString()}`);
+    if (!res.ok) {
+      return null;
+    }
+    const job = await res.json();
+    return {
+      description: job.description || job.title || "",
+      title: job.title || "Job"
+    };
+  }
+  async function fetchJobByUrl(scraperBaseUrl, pageUrl) {
+    const cleanUrl = new URL(pageUrl);
+    cleanUrl.searchParams.delete("jp_candidate");
+    cleanUrl.searchParams.delete("jp_job");
+    const query = new URLSearchParams({ url: cleanUrl.toString() });
+    const res = await fetch(`${scraperBaseUrl}/api/jobs/by-url?${query.toString()}`);
+    if (!res.ok) {
+      return null;
+    }
+    const job = await res.json();
+    return {
+      description: job.description || job.title || "",
+      title: job.title || "Job"
+    };
+  }
+  async function resolveJobDescription(scraperBaseUrl, context) {
+    if (context.jobDescription?.trim()) {
+      return context.jobDescription;
+    }
+    if (context.jobKey) {
+      const byKey = await fetchJobByKey(scraperBaseUrl, context.jobKey);
+      if (byKey?.description) {
+        return byKey.description;
+      }
+    }
+    const byUrl = await fetchJobByUrl(scraperBaseUrl, window.location.href);
+    if (byUrl?.description) {
+      return byUrl.description;
+    }
+    return extractDomJobDescription();
+  }
+  function extractDomJobDescription() {
+    const selectors = [
+      '[data-automation-id="jobPostingDescription"]',
+      '[data-automation-id="jobPostingHeader"]',
+      '[data-qa="job-description"]',
+      ".job-description",
+      "main"
+    ];
+    for (const selector of selectors) {
+      const node = document.querySelector(selector);
+      if (node?.textContent?.trim()) {
+        return node.textContent.trim();
+      }
+    }
+    return document.body.innerText.slice(0, 12e3);
+  }
+  function isWorkdayJobPage() {
+    return /myworkdayjobs\.com/i.test(window.location.hostname) && (/\/job\//i.test(window.location.pathname) || /\/jobs\//i.test(window.location.pathname));
+  }
+  function isApplyPage() {
+    const path = window.location.pathname.toLowerCase();
+    const href = window.location.href.toLowerCase();
+    return /\/apply/i.test(path) || /jobapplication/i.test(href) || Boolean(document.querySelector(
+      '[data-automation-id="applyManually"], [data-automation-id="formField"], [data-automation-id="file-upload-input-ref"]'
+    ));
+  }
+  function isJobPilotEligiblePage() {
+    return isWorkdayJobPage() || isApplyPage() || Boolean(readContextFromUrl());
+  }
+  var DOCK_DISMISS_KEY = `jobpilot_dock_dismissed_${window.location.hostname}`;
+  function escapeHtml(value) {
+    return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function isDockDismissed() {
+    try {
+      return sessionStorage.getItem(DOCK_DISMISS_KEY) === "1";
+    } catch {
+      return false;
+    }
+  }
+  function dismissDock() {
+    try {
+      sessionStorage.setItem(DOCK_DISMISS_KEY, "1");
+    } catch {
+    }
+    removeSideDock();
+  }
+  function findBannerAnchor() {
+    const applyButton = document.querySelector(
+      [
+        '[data-automation-id="jobPostingApplyButton"]',
+        'button[data-automation-id="applyButton"]',
+        'a[data-automation-id="applyButton"]',
+        'a[data-automation-id="adventureButton"]'
+      ].join(", ")
+    );
+    if (applyButton?.parentElement) {
+      return applyButton.parentElement;
+    }
+    const description = document.querySelector(
+      '[data-automation-id="jobPostingDescription"], [data-automation-id="jobPostingPage"]'
+    );
+    if (description) {
+      return description;
+    }
+    const header = document.querySelector('[data-automation-id="jobPostingHeader"]');
+    return header?.parentElement ?? header;
+  }
+  async function waitForBannerAnchor(maxMs = 8e3) {
+    const started = Date.now();
+    while (Date.now() - started < maxMs) {
+      const anchor = findBannerAnchor();
+      if (anchor) {
+        return anchor;
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, 300));
+    }
+    return null;
+  }
+  function removeBanner() {
+    document.getElementById("jobpilot-match-banner")?.remove();
+  }
+  function removeSideDock() {
+    document.getElementById("jobpilot-side-dock")?.remove();
+  }
+  function setDockOpen(open) {
+    const dock = document.getElementById("jobpilot-side-dock");
+    if (!dock) {
+      return;
+    }
+    dock.classList.toggle("jp-dock--open", open);
+    dock.classList.toggle("jp-dock--collapsed", !open);
+  }
+  function renderSideDock(options) {
+    if (isDockDismissed()) {
+      return;
+    }
+    removeSideDock();
+    const host = document.createElement("div");
+    host.id = "jobpilot-side-dock";
+    host.className = options.openByDefault === false ? "jp-dock jp-dock--collapsed" : "jp-dock jp-dock--open";
+    const matchedPreview = options.matched.slice(0, 6).map(escapeHtml).join(", ") || "None";
+    const missingPreview = options.missing.slice(0, 6).map(escapeHtml).join(", ") || "None";
+    const setupBlock = options.setupMessage ? `<p class="jp-dock-setup">${escapeHtml(options.setupMessage)}</p>` : `
+      <div class="jp-dock-score">${Math.round(options.score)}%</div>
+      <p class="jp-dock-subtitle">
+        ${options.matchedCount} of ${options.totalKeywords} keywords matched
+      </p>
+      <p class="jp-dock-detail"><strong>Matched:</strong> ${matchedPreview}</p>
+      <p class="jp-dock-detail jp-dock-detail--missing"><strong>Missing:</strong> ${missingPreview}</p>
+    `;
+    host.innerHTML = `
+    <div class="jp-dock-panel" role="complementary" aria-label="JobPilot assistant">
+      <div class="jp-dock-panel-header">
+        <strong>JobPilot</strong>
+        <button type="button" class="jp-dock-panel-close" aria-label="Collapse panel">\u203A</button>
+      </div>
+      <div class="jp-dock-panel-body">
+        <p class="jp-dock-heading">Resume Match</p>
+        ${setupBlock}
+        <div id="jobpilot-dock-fill-result" class="jp-dock-fill-result hidden"></div>
+        ${options.onAutofill ? '<button type="button" id="jobpilot-dock-autofill" class="jp-dock-autofill">Autofill application</button>' : ""}
+      </div>
+    </div>
+    <div class="jp-dock-tab" aria-label="JobPilot">
+      <button type="button" class="jp-dock-close" aria-label="Close JobPilot">\xD7</button>
+      <div class="jp-dock-logo" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1400" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 4 3 3-9 9H6v-3l9-9Z" />
+          <path d="M9 15l-3 3" />
+        </svg>
+      </div>
+      <button type="button" class="jp-dock-grip" aria-label="Toggle JobPilot panel">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  `;
+    document.documentElement.appendChild(host);
+    host.querySelector(".jp-dock-close")?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      dismissDock();
+    });
+    host.querySelector(".jp-dock-panel-close")?.addEventListener("click", () => {
+      setDockOpen(false);
+    });
+    host.querySelector(".jp-dock-grip")?.addEventListener("click", () => {
+      const dock = document.getElementById("jobpilot-side-dock");
+      if (!dock) {
+        return;
+      }
+      setDockOpen(!dock.classList.contains("jp-dock--open"));
+    });
+    host.querySelector(".jp-dock-tab")?.addEventListener("click", (event) => {
+      const target = event.target;
+      if (target.closest(".jp-dock-close") || target.closest(".jp-dock-grip")) {
+        return;
+      }
+      setDockOpen(true);
+    });
+    if (options.onAutofill) {
+      host.querySelector("#jobpilot-dock-autofill")?.addEventListener("click", options.onAutofill);
+    }
+  }
+  function updateDockFillResult(summary) {
+    const dock = document.getElementById("jobpilot-side-dock");
+    const resultEl = dock?.querySelector("#jobpilot-dock-fill-result");
+    if (!dock || !resultEl) {
+      return;
+    }
+    setDockOpen(true);
+    resultEl.classList.remove("hidden");
+    const failureItems = summary.failed.map(
+      (item) => `
+        <div class="jp-dock-failure">
+          <span class="jp-dock-failure-field">${escapeHtml(item.jsonPath)}</span>
+          <span class="jp-dock-failure-message">${escapeHtml(item.message ?? "Unknown error")}</span>
+        </div>
+      `
+    ).join("");
+    resultEl.innerHTML = `
+    <div class="jp-dock-fill-summary ${summary.failed.length ? "is-error" : "is-success"}">
+      <strong>${summary.failed.length ? "Autofill completed with errors" : "Autofill successful"}</strong>
+      <div class="jp-dock-fill-stats">
+        <span>${summary.filled.length} filled</span>
+        <span>${summary.skipped.length} skipped</span>
+        <span>${summary.failed.length} failed</span>
+      </div>
+      ${summary.failed.length ? `<div class="jp-dock-fill-failures">${failureItems}</div>` : ""}
+    </div>
+  `;
+  }
+  function buildGaugeSvg(score) {
+    const radius = 22;
+    const circumference = 2 * Math.PI * radius;
+    const progress = Math.max(0, Math.min(100, score)) / 100;
+    const dash = circumference * progress;
+    return `
+    <svg viewBox="0 0 56 56" aria-hidden="true">
+      <circle cx="28" cy="28" r="${radius}" fill="none" stroke="#262B33" stroke-width="6"></circle>
+      <circle
+        cx="28"
+        cy="28"
+        r="${radius}"
+        fill="none"
+        stroke="#F2B84B"
+        stroke-width="6"
+        stroke-linecap="round"
+        stroke-dasharray="${dash} ${circumference - dash}"
+      ></circle>
+    </svg>
+  `;
+  }
+  function renderInlineBanner(options) {
+    removeBanner();
+    const anchor = findBannerAnchor();
+    if (!anchor) {
+      return false;
+    }
+    const host = document.createElement("div");
+    host.id = "jobpilot-match-banner";
+    host.style.cssText = "margin: 16px 0 12px; width: 100%;";
+    if (options.setupMessage) {
+      host.innerHTML = `
+      <div class="jp-banner-inner">
+        <div class="jp-copy">
+          <p class="jp-title">Resume Match</p>
+          <p class="jp-subtitle">${options.setupMessage}</p>
+          <p class="jp-meta">Open http://localhost:5173/profile to save your resume, then refresh this page.</p>
+        </div>
+        <div class="jp-actions">
+          <span class="jp-brand">JobPilot</span>
+          <button type="button" class="jp-dismiss" id="jobpilot-inline-dismiss" aria-label="Dismiss">\xD7</button>
+        </div>
+      </div>
+    `;
+    } else {
+      host.innerHTML = `
+      <div class="jp-banner-inner">
+        <div class="jp-gauge">
+          ${buildGaugeSvg(options.score)}
+          <div class="jp-gauge-label">${Math.round(options.score)}%</div>
+        </div>
+        <div class="jp-copy">
+          <p class="jp-title">Resume Match</p>
+          <p class="jp-subtitle">
+            ${options.matchedCount} of ${options.totalKeywords} keywords are present in your resume
+          </p>
+          <p class="jp-meta">Uses JobPilot skill matching from your saved profile</p>
+        </div>
+        <div class="jp-actions">
+          <span class="jp-brand">JobPilot</span>
+          ${options.onAutofill ? '<button type="button" class="jp-autofill" id="jobpilot-inline-autofill">Autofill</button>' : ""}
+          <button type="button" class="jp-dismiss" id="jobpilot-inline-dismiss" aria-label="Dismiss">\xD7</button>
+        </div>
+      </div>
+    `;
+    }
+    anchor.insertAdjacentElement("afterend", host);
+    host.querySelector("#jobpilot-inline-dismiss")?.addEventListener("click", removeBanner);
+    if (options.onAutofill) {
+      host.querySelector("#jobpilot-inline-autofill")?.addEventListener("click", options.onAutofill);
+    }
+    return true;
+  }
+  function computeAnalysis(profileText, jobDescription) {
+    const analysis = analyzeMatch({
+      professionalSummary: profileText,
+      jobDescription,
+      useWeightedScoring: true
+    });
+    const score = analysis.weightedResult?.weightedScore ?? analysis.result.score;
+    const matched = analysis.result.matchedSkills;
+    const missing = analysis.result.missingSkills;
+    const totalKeywords = analysis.jdSkillCount || matched.length + missing.length;
+    return {
+      score,
+      matched,
+      missing,
+      matchedCount: matched.length,
+      totalKeywords
+    };
+  }
+  async function showMatchOverlay(context) {
+    const now = Date.now();
+    if (overlayInFlight || now - lastOverlayAt < 1200) {
+      return;
+    }
+    overlayInFlight = true;
+    try {
+      const settings = await getSettings();
+      if (context.candidateId) {
+        await persistCandidateId(context.candidateId);
+      }
+      if (isWorkdayJobPage()) {
+        await waitForBannerAnchor();
+      }
+      const candidate = await resolveCandidate(settings, context);
+      const profileText = buildUserMatchText2(candidate);
+      const jobDescription = await resolveJobDescription(settings.scraperBaseUrl, context);
+      const analysis = computeAnalysis(profileText, jobDescription);
+      const onAutofill = () => {
+        void runAutofill(candidate);
+      };
+      if (isWorkdayJobPage()) {
+        const rendered = renderInlineBanner({
+          score: analysis.score,
+          matchedCount: analysis.matchedCount,
+          totalKeywords: analysis.totalKeywords,
+          onAutofill
+        });
+        renderSideDock({
+          score: analysis.score,
+          matchedCount: analysis.matchedCount,
+          totalKeywords: analysis.totalKeywords,
+          matched: analysis.matched,
+          missing: analysis.missing,
+          onAutofill,
+          openByDefault: isApplyPage() || !rendered
+        });
+        domRetryCount = MAX_DOM_RETRIES;
+        return;
+      }
+      renderSideDock({
+        score: analysis.score,
+        matchedCount: analysis.matchedCount,
+        totalKeywords: analysis.totalKeywords,
+        matched: analysis.matched,
+        missing: analysis.missing,
+        onAutofill,
+        openByDefault: true
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Match scoring unavailable.";
+      console.error("[JobPilot] Match overlay failed:", error);
+      const needsProfile = /profile|candidate|fetch profile/i.test(message);
+      const isQuotaError = /MAX_WRITE_OPERATIONS|quota/i.test(message);
+      if (isWorkdayJobPage() || isApplyPage()) {
+        await waitForBannerAnchor();
+        const rendered = isWorkdayJobPage() ? renderInlineBanner({
+          setupMessage: isQuotaError ? "JobPilot is syncing your profile. Refresh this page in a few seconds." : needsProfile ? message : "Could not score this job yet. Save your profile on JobPilot and refresh.",
+          score: 0,
+          matchedCount: 0,
+          totalKeywords: 0
+        }) : false;
+        renderSideDock({
+          score: 0,
+          matchedCount: 0,
+          totalKeywords: 0,
+          matched: [],
+          missing: [message],
+          setupMessage: isQuotaError ? "JobPilot is syncing your profile. Refresh this page in a few seconds." : needsProfile ? message : "Could not score this job yet. Save your profile on JobPilot and refresh.",
+          openByDefault: isApplyPage() || !rendered
+        });
+      }
+    } finally {
+      overlayInFlight = false;
+      lastOverlayAt = Date.now();
+    }
+  }
+  async function runAutofill(candidateData) {
+    try {
+      const summary = await runFillEngine(document, candidateData, {
+        onLog: (msg, detail) => console.log("[JobPilot]", msg, detail ?? "")
+      });
+      updateDockFillResult(summary);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Autofill failed";
+      const dock = document.getElementById("jobpilot-side-dock");
+      const resultEl = dock?.querySelector("#jobpilot-dock-fill-result");
+      if (dock && resultEl) {
+        setDockOpen(true);
+        resultEl.classList.remove("hidden");
+        resultEl.innerHTML = `<div class="jp-dock-fill-summary is-error"><strong>Autofill failed</strong><p>${escapeHtml(message)}</p></div>`;
+      } else {
+        alert(message);
+      }
+    }
+  }
+  function syncProfileFromFrontend() {
+    if (window.location.hostname !== "localhost" || window.location.port !== "5173") {
+      return;
+    }
+    const candidateId = localStorage.getItem("jobpilot_candidate_id");
+    const rawData = localStorage.getItem("jobpilot_candidate_data");
+    if (!candidateId) {
+      return;
+    }
+    void persistCandidateId(candidateId);
+    if (rawData) {
+      try {
+        const data = JSON.parse(rawData);
+        void persistProfileCache(candidateId, data);
+      } catch {
+      }
+    }
+  }
+  var refreshTimer;
+  function scheduleMatchRefresh(context) {
+    if (domRetryCount >= MAX_DOM_RETRIES) {
+      return;
+    }
+    domRetryCount += 1;
+    window.clearTimeout(refreshTimer);
+    refreshTimer = window.setTimeout(() => {
+      void showMatchOverlay(context);
+    }, 1200);
+  }
+  function bootMatchWidget() {
+    syncProfileFromFrontend();
+    const urlContext = readContextFromUrl();
+    const context = urlContext ?? {};
+    if (isJobPilotEligiblePage()) {
+      void showMatchOverlay(context);
+    }
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+      if (areaName !== "local" || !changes[API_CACHE_KEY]) {
+        return;
+      }
+      domRetryCount = 0;
+      scheduleMatchRefresh(context);
+    });
+    if (window.location.hostname === "localhost" && window.location.port === "5173") {
+      window.addEventListener("storage", () => {
+        syncProfileFromFrontend();
+      });
+    }
+    if (isWorkdayJobPage() || isApplyPage()) {
+      const observer = new MutationObserver(() => {
+        if (document.getElementById("jobpilot-match-banner") || document.getElementById("jobpilot-side-dock")) {
+          return;
+        }
+        scheduleMatchRefresh(context);
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+  }
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message?.type === "PING") {
       sendResponse({ ok: true, version: chrome.runtime.getManifest().version });
+      return false;
+    }
+    if (message?.type === "SHOW_MATCH") {
+      void showMatchOverlay(message.context);
+      sendResponse({ ok: true });
       return false;
     }
     if (message?.type !== "AUTOFILL") {
@@ -1225,6 +2459,7 @@
     })();
     return true;
   });
-  console.log("[JobPilot] Content script ready on", window.location.hostname);
+  bootMatchWidget();
+  console.log("[JobPilot] Integrated content script ready on", window.location.hostname);
 })();
 //# sourceMappingURL=content.js.map

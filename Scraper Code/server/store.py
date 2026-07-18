@@ -119,6 +119,14 @@ class Store(ABC):
     def distinct_job_facets(self) -> dict[str, list[str]]:
         """Return sorted distinct values for slicer dropdowns (source, country, ...)."""
 
+    @abstractmethod
+    def get_job_by_key(
+        self, company_id: str, source: str, job_id: str
+    ) -> dict[str, Any] | None: ...
+
+    @abstractmethod
+    def get_job_by_url(self, url: str) -> dict[str, Any] | None: ...
+
 
 # ---------------------------------------------------------------------------
 # Supabase PostgREST backend
@@ -442,7 +450,7 @@ class SupabaseStore(Store):
     # /api/companies without a per-row join.
     _JOB_BROWSE_COLS = (
         "company_id,source,job_id,title,location,country,date_posted,"
-        "detail_url,employment_type,hiring_org,scraped_at"
+        "detail_url,employment_type,hiring_org,scraped_at,description"
     )
 
     def _apply_job_filters(
@@ -591,6 +599,46 @@ class SupabaseStore(Store):
             "company_ids":      sorted(cids),
         }
 
+    def get_job_by_key(
+        self, company_id: str, source: str, job_id: str
+    ) -> dict[str, Any] | None:
+        try:
+            resp = self._request(
+                "GET",
+                JOBS_TABLE,
+                params={
+                    "select": "*",
+                    "company_id": f"eq.{company_id}",
+                    "source": f"eq.{source}",
+                    "job_id": f"eq.{job_id}",
+                    "limit": 1,
+                },
+            )
+        except PostgrestError as exc:
+            if exc.status == 404:
+                return None
+            raise
+        rows = resp.json()
+        return rows[0] if rows else None
+
+    def get_job_by_url(self, url: str) -> dict[str, Any] | None:
+        try:
+            resp = self._request(
+                "GET",
+                JOBS_TABLE,
+                params={
+                    "select": "*",
+                    "detail_url": f"eq.{url}",
+                    "limit": 1,
+                },
+            )
+        except PostgrestError as exc:
+            if exc.status == 404:
+                return None
+            raise
+        rows = resp.json()
+        return rows[0] if rows else None
+
 
 # ---------------------------------------------------------------------------
 # Factory
@@ -603,15 +651,26 @@ _store: Store | None = None
 def build_store() -> Store:
     """Return a fresh :class:`Store` based on env vars."""
     supabase_url = os.getenv("SUPABASE_URL")
-    supabase_key = os.getenv("SUPABASE_SERVICE_KEY") or os.getenv("SUPABASE_KEY")
+    supabase_key = (
+        os.getenv("SUPABASE_SERVICE_KEY")
+        or os.getenv("SUPABASE_KEY")
+        or os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+    )
 
     if supabase_url and supabase_key:
         log.info("using SupabaseStore backend (url=%s)", supabase_url)
         return SupabaseStore(supabase_url, supabase_key)
 
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        from .postgres_api_store import DirectPostgresStore
+
+        log.info("using DirectPostgresStore backend (DATABASE_URL)")
+        return DirectPostgresStore(database_url)
+
     raise RuntimeError(
         "No storage backend configured. Set SUPABASE_URL and SUPABASE_SERVICE_KEY "
-        "in your .env (Supabase Dashboard -> Project Settings -> API)."
+        "or DATABASE_URL in your .env."
     )
 
 

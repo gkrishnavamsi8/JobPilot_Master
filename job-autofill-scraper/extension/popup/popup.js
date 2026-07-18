@@ -1,5 +1,5 @@
 const DEFAULT_SETTINGS = {
-  dataMode: 'json',
+  dataMode: 'api',
   candidateJson: '',
   apiBaseUrl: 'http://localhost:3001',
   apiKey: '',
@@ -44,49 +44,200 @@ const SAMPLE_CANDIDATE_DATA = {
       location: 'San Francisco, CA',
       description: 'Led frontend platform migration to React and TypeScript.',
     },
-    {
-      title: 'Software Engineer',
-      company: 'StartupXYZ',
-      location: 'Remote',
-      description: 'Built REST APIs and internal tooling with Node.js.',
-    },
   ],
 };
 
 const els = {
-  dataModeRadios: document.querySelectorAll('input[name="dataMode"]'),
+  segmentBtns: document.querySelectorAll('.jp-segment-btn'),
   jsonPanel: document.getElementById('jsonPanel'),
   apiPanel: document.getElementById('apiPanel'),
   candidateJson: document.getElementById('candidateJson'),
   loadSample: document.getElementById('loadSample'),
+  settingsToggle: document.getElementById('settingsToggle'),
+  settingsPanel: document.getElementById('settingsPanel'),
   apiBaseUrl: document.getElementById('apiBaseUrl'),
   apiKey: document.getElementById('apiKey'),
-  lookupModeRadios: document.querySelectorAll('input[name="lookupMode"]'),
+  lookupBtns: document.querySelectorAll('.jp-lookup-btn'),
   emailLookupLabel: document.getElementById('emailLookupLabel'),
   idLookupLabel: document.getElementById('idLookupLabel'),
   candidateEmail: document.getElementById('candidateEmail'),
   candidateId: document.getElementById('candidateId'),
-  saveSettings: document.getElementById('saveSettings'),
   fetchProfile: document.getElementById('fetchProfile'),
-  cacheStatus: document.getElementById('cacheStatus'),
   fillPage: document.getElementById('fillPage'),
   validateJson: document.getElementById('validateJson'),
   status: document.getElementById('status'),
+  profileIdle: document.getElementById('profileIdle'),
+  profileFetching: document.getElementById('profileFetching'),
+  profileLoaded: document.getElementById('profileLoaded'),
+  profileAvatar: document.getElementById('profileAvatar'),
+  profileName: document.getElementById('profileName'),
+  profileDetail: document.getElementById('profileDetail'),
+  profileFilledIcon: document.getElementById('profileFilledIcon'),
+  steps: document.querySelectorAll('.jp-step'),
+  stepLines: document.querySelectorAll('.jp-step-line'),
+  closePopup: document.getElementById('closePopup'),
+  resultPanel: document.getElementById('resultPanel'),
+  resultTitle: document.getElementById('resultTitle'),
+  clearResult: document.getElementById('clearResult'),
+  statFilled: document.getElementById('statFilled'),
+  statSkipped: document.getElementById('statSkipped'),
+  statFailed: document.getElementById('statFailed'),
+  resultFailures: document.getElementById('resultFailures'),
+  scrollBody: document.querySelector('.jp-scroll-body'),
 };
+
+let uiStatus = 'idle';
+let activeProfile = null;
+
+const CHECK_ICON = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>';
+const DASH_ICON = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="4 4"/></svg>';
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function hideResultPanel() {
+  els.resultPanel.classList.add('hidden');
+  els.resultPanel.classList.remove('is-error', 'is-success');
+  els.resultFailures.classList.add('hidden');
+  els.resultFailures.innerHTML = '';
+}
+
+function renderFillResult(summary) {
+  const { filled, skipped, failed } = summary;
+  els.statFilled.textContent = filled.length;
+  els.statSkipped.textContent = skipped.length;
+  els.statFailed.textContent = failed.length;
+
+  const hasFailures = failed.length > 0;
+  els.resultPanel.classList.remove('hidden');
+  els.resultPanel.classList.toggle('is-error', hasFailures);
+  els.resultPanel.classList.toggle('is-success', !hasFailures);
+  els.resultTitle.textContent = hasFailures
+    ? 'Autofill completed with errors'
+    : 'Autofill successful';
+
+  if (hasFailures) {
+    els.resultFailures.classList.remove('hidden');
+    els.resultFailures.innerHTML = failed
+      .map(
+        (item) => `
+          <div class="jp-failure-item">
+            <span class="jp-failure-field">${escapeHtml(item.jsonPath)}</span>
+            <span class="jp-failure-message">${escapeHtml(item.message ?? 'Unknown error')}</span>
+          </div>
+        `,
+      )
+      .join('');
+  } else {
+    els.resultFailures.classList.add('hidden');
+    els.resultFailures.innerHTML = '';
+  }
+
+  setStatus(
+    hasFailures ? '' : `All ${filled.length} fields filled successfully.`,
+    hasFailures ? '' : 'success',
+  );
+
+  requestAnimationFrame(() => {
+    els.resultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (els.scrollBody) {
+      els.scrollBody.scrollTop = els.scrollBody.scrollHeight;
+    }
+  });
+}
 
 function setStatus(message, type = '') {
   els.status.textContent = message;
-  els.status.className = `status ${type}`.trim();
+  els.status.className = `jp-status ${type}`.trim();
+  if (type === 'error') {
+    hideResultPanel();
+  }
 }
 
 function getSelectedMode() {
-  const checked = document.querySelector('input[name="dataMode"]:checked');
-  return checked?.value === 'api' ? 'api' : 'json';
+  const active = document.querySelector('.jp-segment-btn.is-active');
+  return active?.dataset.source === 'json' ? 'json' : 'api';
 }
 
 function getLookupMode() {
-  const checked = document.querySelector('input[name="lookupMode"]:checked');
-  return checked?.value === 'id' ? 'id' : 'email';
+  const active = document.querySelector('.jp-lookup-btn.is-active');
+  return active?.dataset.lookup === 'id' ? 'id' : 'email';
+}
+
+function profileFromData(data) {
+  const first = data?.profile?.first_name ?? '';
+  const last = data?.profile?.last_name ?? '';
+  const name = [first, last].filter(Boolean).join(' ') || 'Candidate';
+  const email = data?.profile?.email ?? '';
+  const title = data?.work_experience?.[0]?.title ?? data?.profile?.summary?.slice(0, 48) ?? 'Profile loaded';
+  const location = [data?.profile?.address?.city, data?.profile?.address?.state].filter(Boolean).join(', ');
+  return { name, email, title, location, initials: name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase() };
+}
+
+function getStepIndex() {
+  if (uiStatus === 'idle') return 0;
+  if (uiStatus === 'fetching') return 2;
+  if (uiStatus === 'loaded') return 2;
+  if (uiStatus === 'filling' || uiStatus === 'filled') return 3;
+  return 1;
+}
+
+function renderStepper() {
+  const stepIndex = getStepIndex();
+  els.steps.forEach((step, index) => {
+    step.classList.toggle('is-done', index < stepIndex);
+    step.classList.toggle('is-active', index === stepIndex);
+    const icon = step.querySelector('.jp-step-icon');
+    if (icon) {
+      icon.innerHTML = index < stepIndex ? CHECK_ICON : DASH_ICON;
+    }
+  });
+  els.stepLines.forEach((line, index) => {
+    line.classList.toggle('is-done', index < stepIndex);
+  });
+}
+
+function renderProfileCard() {
+  els.profileIdle.classList.toggle('hidden', uiStatus !== 'idle');
+  els.profileFetching.classList.toggle('hidden', uiStatus !== 'fetching');
+  els.profileLoaded.classList.toggle('hidden', !activeProfile || uiStatus === 'idle' || uiStatus === 'fetching');
+
+  if (activeProfile) {
+    els.profileAvatar.textContent = activeProfile.initials;
+    els.profileName.textContent = activeProfile.name;
+    const detailParts = [activeProfile.title, activeProfile.email].filter(Boolean);
+    els.profileDetail.textContent = detailParts.join(' · ');
+    els.profileFilledIcon.classList.toggle('hidden', uiStatus !== 'filled');
+  }
+
+  const canFill = Boolean(activeProfile) && uiStatus !== 'filling';
+  els.fillPage.disabled = !canFill;
+
+  const fillLabel = els.fillPage.querySelector('.jp-btn-label');
+  if (fillLabel) {
+    if (uiStatus === 'filled') {
+      fillLabel.innerHTML = `${CHECK_ICON} Filled`;
+    } else if (uiStatus === 'filling') {
+      fillLabel.textContent = 'Filling…';
+    } else {
+      fillLabel.innerHTML =
+        '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 4 3 3-9 9H6v-3l9-9Z"/><path d="M9 15l-3 3"/><path d="m18 7 3 3"/></svg> Fill this page';
+    }
+  }
+
+  els.fillPage.classList.toggle('is-filling', uiStatus === 'filling');
+  renderStepper();
+}
+
+function setUiStatus(next, profile = activeProfile) {
+  uiStatus = next;
+  activeProfile = profile;
+  renderProfileCard();
 }
 
 function updateLookupPanels() {
@@ -99,9 +250,9 @@ function updateModePanels() {
   const mode = getSelectedMode();
   els.jsonPanel.classList.toggle('hidden', mode !== 'json');
   els.apiPanel.classList.toggle('hidden', mode !== 'api');
+  els.fetchProfile.classList.toggle('hidden', mode !== 'api');
   if (mode === 'api') {
     updateLookupPanels();
-    updateCacheStatus();
   }
 }
 
@@ -130,27 +281,6 @@ function isCacheValid(settings, cache) {
   return cache.lookupKey === buildLookupKey(settings);
 }
 
-async function updateCacheStatus() {
-  if (!els.cacheStatus) return;
-  const settings = await getApiSettings();
-  const cache = await readCandidateCache();
-  if (!isCacheValid(settings, cache)) {
-    els.cacheStatus.textContent = 'No profile loaded — click "Fetch profile" first.';
-    els.cacheStatus.className = 'cache-status';
-    return;
-  }
-  const name = [cache.data?.profile?.first_name, cache.data?.profile?.last_name]
-    .filter(Boolean)
-    .join(' ');
-  const when = cache.fetchedAt
-    ? new Date(cache.fetchedAt).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })
-    : 'unknown time';
-  els.cacheStatus.textContent = name
-    ? `Using cached profile: ${name} (fetched ${when}).`
-    : `Profile cached (fetched ${when}).`;
-  els.cacheStatus.className = 'cache-status ready';
-}
-
 async function writeCandidateCache(settings, data) {
   await chrome.storage.local.set({
     [API_CACHE_KEY]: {
@@ -159,23 +289,37 @@ async function writeCandidateCache(settings, data) {
       fetchedAt: new Date().toISOString(),
     },
   });
-  await updateCacheStatus();
+}
+
+async function hydrateProfileFromCache() {
+  if (getSelectedMode() === 'json') {
+    return;
+  }
+  const settings = await getApiSettings();
+  const cache = await readCandidateCache();
+  if (isCacheValid(settings, cache)) {
+    setUiStatus('loaded', profileFromData(cache.data));
+  }
 }
 
 async function loadSettings() {
   const stored = await chrome.storage.sync.get(DEFAULT_SETTINGS);
-  for (const radio of els.dataModeRadios) {
-    radio.checked = radio.value === stored.dataMode;
-  }
+  els.segmentBtns.forEach((btn) => {
+    const active = btn.dataset.source === (stored.dataMode || 'api');
+    btn.classList.toggle('is-active', active);
+    btn.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
   els.candidateJson.value = stored.candidateJson || JSON.stringify(SAMPLE_CANDIDATE_DATA, null, 2);
-  els.apiBaseUrl.value = stored.apiBaseUrl;
-  els.apiKey.value = stored.apiKey;
-  for (const radio of els.lookupModeRadios) {
-    radio.checked = radio.value === (stored.lookupMode || 'email');
-  }
+  els.apiBaseUrl.value = stored.apiBaseUrl || DEFAULT_SETTINGS.apiBaseUrl;
+  els.apiKey.value = stored.apiKey || '';
+  els.lookupBtns.forEach((btn) => {
+    btn.classList.toggle('is-active', btn.dataset.lookup === (stored.lookupMode || 'email'));
+  });
   els.candidateEmail.value = stored.candidateEmail || DEFAULT_SETTINGS.candidateEmail;
-  els.candidateId.value = stored.candidateId;
+  els.candidateId.value = stored.candidateId || '';
   updateModePanels();
+  await hydrateProfileFromCache();
+  renderProfileCard();
 }
 
 async function persistSettings() {
@@ -230,7 +374,8 @@ async function fetchCandidateFromApi(settings) {
 async function resolveCandidateData({ allowFetch = false } = {}) {
   const mode = getSelectedMode();
   if (mode === 'json') {
-    return parseCandidateJson();
+    const data = parseCandidateJson();
+    return data;
   }
 
   const settings = await getApiSettings();
@@ -240,7 +385,7 @@ async function resolveCandidateData({ allowFetch = false } = {}) {
   }
 
   if (!allowFetch) {
-    throw new Error('No cached profile. Click "Fetch profile" first (or after changing email/ID).');
+    throw new Error('No cached profile. Click "Fetch profile" first.');
   }
 
   const data = await fetchCandidateFromApi(settings);
@@ -253,7 +398,7 @@ async function ensureContentScript(tabId) {
     const ping = await chrome.tabs.sendMessage(tabId, { type: 'PING' });
     if (ping?.ok) return;
   } catch {
-    // Not injected yet — inject on demand (works on any site after you click Fill).
+    // Not injected yet.
   }
 
   await chrome.scripting.executeScript({
@@ -291,52 +436,63 @@ async function fillActiveTab(candidateData) {
   return response.summary;
 }
 
-for (const radio of els.dataModeRadios) {
-  radio.addEventListener('change', () => {
+els.segmentBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    els.segmentBtns.forEach((other) => {
+      other.classList.toggle('is-active', other === btn);
+      other.setAttribute('aria-selected', other === btn ? 'true' : 'false');
+    });
     updateModePanels();
-    persistSettings();
+    void persistSettings();
+    if (getSelectedMode() === 'json') {
+      setUiStatus('idle', null);
+    } else {
+      void hydrateProfileFromCache();
+    }
   });
-}
+});
 
-for (const radio of els.lookupModeRadios) {
-  radio.addEventListener('change', () => {
+els.lookupBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    els.lookupBtns.forEach((other) => other.classList.toggle('is-active', other === btn));
     updateLookupPanels();
-    persistSettings();
-    updateCacheStatus();
+    void persistSettings();
+    setUiStatus('idle', null);
+  });
+});
+
+for (const input of [els.candidateEmail, els.candidateId, els.apiBaseUrl, els.apiKey]) {
+  input.addEventListener('change', () => {
+    void persistSettings();
+    if (getSelectedMode() === 'api') {
+      setUiStatus('idle', null);
+    }
   });
 }
 
-for (const input of [els.candidateEmail, els.candidateId, els.apiBaseUrl]) {
-  input.addEventListener('change', () => {
-    persistSettings();
-    updateCacheStatus();
-  });
-}
+els.settingsToggle.addEventListener('click', () => {
+  const open = els.settingsPanel.classList.toggle('hidden');
+  els.settingsToggle.setAttribute('aria-expanded', open ? 'false' : 'true');
+});
 
 els.loadSample.addEventListener('click', () => {
   els.candidateJson.value = JSON.stringify(SAMPLE_CANDIDATE_DATA, null, 2);
   setStatus('Sample data loaded.', 'success');
 });
 
-els.saveSettings.addEventListener('click', () => {
-  persistSettings()
-    .then(() => {
-      updateCacheStatus();
-      setStatus('API settings saved.', 'success');
-    })
-    .catch((err) => setStatus(err.message, 'error'));
-});
-
 els.fetchProfile.addEventListener('click', async () => {
   try {
-    setStatus('Fetching profile from API…');
+    setStatus('');
+    setUiStatus('fetching', null);
     await persistSettings();
     const settings = await getApiSettings();
     const data = await fetchCandidateFromApi(settings);
     await writeCandidateCache(settings, data);
-    const name = [data?.profile?.first_name, data?.profile?.last_name].filter(Boolean).join(' ');
-    setStatus(name ? `Profile loaded — ${name}.` : 'Profile loaded and cached.', 'success');
+    const profile = profileFromData(data);
+    setUiStatus('loaded', profile);
+    setStatus(`Profile loaded — ${profile.name}.`, 'success');
   } catch (error) {
+    setUiStatus('idle', null);
     setStatus(error.message, 'error');
   }
 });
@@ -344,9 +500,10 @@ els.fetchProfile.addEventListener('click', async () => {
 els.validateJson.addEventListener('click', () => {
   try {
     const data = parseCandidateJson();
-    const name = [data?.profile?.first_name, data?.profile?.last_name].filter(Boolean).join(' ');
-    setStatus(`Valid JSON${name ? ` — ${name}` : ''}.`, 'success');
-    persistSettings();
+    const profile = profileFromData(data);
+    setUiStatus('loaded', profile);
+    setStatus(`Valid JSON — ${profile.name}.`, 'success');
+    void persistSettings();
   } catch (error) {
     setStatus(error.message, 'error');
   }
@@ -354,24 +511,30 @@ els.validateJson.addEventListener('click', () => {
 
 els.fillPage.addEventListener('click', async () => {
   try {
-    setStatus('Running autofill…');
+    setStatus('');
+    setUiStatus('filling', activeProfile);
     await persistSettings();
     const candidateData = await resolveCandidateData({ allowFetch: false });
+    if (!activeProfile) {
+      setUiStatus('loaded', profileFromData(candidateData));
+    }
     const summary = await fillActiveTab(candidateData);
     const { filled, skipped, failed } = summary;
-    const lines = [
-      `Done — filled ${filled.length}, skipped ${skipped.length}, failed ${failed.length}.`,
-    ];
-    if (failed.length > 0) {
-      lines.push('', 'Failed:');
-      for (const item of failed.slice(0, 5)) {
-        lines.push(`• ${item.jsonPath}: ${item.message ?? 'unknown error'}`);
-      }
-    }
-    setStatus(lines.join('\n'), failed.length ? 'error' : 'success');
+    setUiStatus('filled', activeProfile ?? profileFromData(candidateData));
+    renderFillResult(summary);
   } catch (error) {
+    setUiStatus(activeProfile ? 'loaded' : 'idle', activeProfile);
     setStatus(error.message, 'error');
   }
 });
 
-loadSettings();
+els.closePopup?.addEventListener('click', () => {
+  window.close();
+});
+
+els.clearResult?.addEventListener('click', () => {
+  hideResultPanel();
+  setStatus('');
+});
+
+void loadSettings();

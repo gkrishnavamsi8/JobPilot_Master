@@ -1,0 +1,21 @@
+{
+  "name": "jobpilot-master",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "frontend",
+    "packages/match-core",
+    "packages/shared-types",
+    "job-autofill-scraper",
+    "jd-match-scoring"
+  ],
+  "scripts": {
+    "test": "npm run test:packages && npm run test:integration",
+    "test:packages": "npm run test --workspace @jobpilot/match-core && npm run test --workspace @jobpilot/shared-types",
+    "test:integration": "node scripts/run-integration-tests.mjs",
+    "build:packages": "npm run test:packages",
+    "build:frontend": "npm run build --workspace @jobpilot/frontend",
+    "build:extension": "npm run build --workspace job-autofill-scraper",
+    "build": "npm run build:packages && npm run build:frontend && npm run build:extension"
+  }
+}

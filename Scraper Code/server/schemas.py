@@ -139,6 +139,7 @@ class JobBrowseRow(BaseModel):
     employment_type: str | None = None
     hiring_org: str | None = None
     scraped_at: datetime | None = None
+    description: str | None = None
 
 
 class JobBrowsePage(BaseModel):

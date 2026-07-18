@@ -1,5 +1,5 @@
 from pathlib import Path
-from urllib.parse import quote_plus, unquote
+from urllib.parse import parse_qs, quote_plus, unquote, urlencode, urlparse, urlunparse
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -40,6 +40,14 @@ def normalize_database_url(url: str) -> str:
         if "sslmode=" not in url:
             url = f"{url}{'&' if '?' in url else '?'}sslmode=require"
 
+    # psycopg rejects Prisma/Supabase pooler-only params like pgbouncer=true
+    parsed = urlparse(url)
+    if parsed.query:
+        params = parse_qs(parsed.query, keep_blank_values=True)
+        params.pop("pgbouncer", None)
+        query = urlencode(params, doseq=True)
+        url = urlunparse(parsed._replace(query=query))
+
     return url
 
 class Settings(BaseSettings):
@@ -48,6 +56,8 @@ class Settings(BaseSettings):
     # Set DATABASE_URL in .env — Supabase: Project Settings → Database → Connection string
     database_url: str = "sqlite:///./data/jobpilot.db"
     upload_dir: Path = Path("./data/uploads")
+    # Signs auth tokens — override with SECRET_KEY in .env for production
+    secret_key: str = "jobpilot-dev-secret-change-me"
 
     @field_validator("database_url", mode="before")
     @classmethod

@@ -1,56 +1,111 @@
-# JobPilot
+# JobPilot Master — Integrated Monorepo
 
-Monorepo for job search tooling.
+End-to-end job search workflow:
+
+**Sign in → Parse resume → Scrape jobs → Preview match → Apply & track → Extension overlay → Autofill**
+
+The unified web app has account login (register/sign-in), a dashboard, profile
+(resume parsing), a scored job browser, and an application tracker. The Parser
+API owns auth (`/auth/register`, `/auth/login`, `/auth/me`) and application
+logging (`/applications`); tokens are HMAC-signed — set `SECRET_KEY` in
+`JobPilot-Parser/.env` for production. The Parser runs on SQLite out of the box,
+so login → profile → jobs → applications works with no Supabase configured
+(the job browser falls back to labeled sample listings until the Scraper API
+is up).
 
 ## Projects
 
-| Folder | Purpose | Status |
-|--------|---------|--------|
-| [`jd-match-scoring/`](./jd-match-scoring/) | Resume ↔ JD match scoring UI (React + Vite) | Active |
-| [`job-autofill-scraper/`](./job-autofill-scraper/) | Browser extension + API to auto-fill job applications (Workday, Greenhouse) | Active |
-| [`JobPilot-Parser/`](./JobPilot-Parser/) | Resume parsing app | Existing |
-| [`Scraper Code/`](./Scraper%20Code/) | Legacy scraper code | Existing |
+| Path | Role |
+|------|------|
+| `JobPilot-Parser/` | Step 1 — Resume parsing API (port **8002**) |
+| `Scraper Code/` | Step 2 — Job scraper API (port **8000**) |
+| `frontend/` | Steps 1+3 — Unified UI (Profile + Jobs, port **5173**) |
+| `packages/match-core/` | Shared JD match scoring library |
+| `packages/shared-types/` | Shared candidate/job types + helpers |
+| `job-autofill-scraper/` | Steps 4+5 — Extension + autofill API (port **3001**) |
+| `jd-match-scoring/` | Standalone scoring sandbox |
+
+See [`docs/INTEGRATION_PLAN.md`](./docs/INTEGRATION_PLAN.md) for architecture details.
 
 ## Quick start
 
-### JD Match Scoring
+### 1. Environment
 
-```bash
-cd jd-match-scoring
+Copy root env template into each service as needed:
+
+```powershell
+copy .env.example .env
+```
+
+Configure Supabase credentials in:
+- `JobPilot-Parser/.env`
+- `Scraper Code/.env`
+- `job-autofill-scraper/.env`
+
+### 2. Install JS dependencies
+
+```powershell
+cd D:\Projects\JobPilot-Master
 npm install
+```
+
+### 3. Start services (4 terminals)
+
+```powershell
+# Parser API
+cd JobPilot-Parser
+pip install -r requirements.txt && pip install -e .
+uvicorn jobpilot.api.main:app --reload --port 8002
+
+# Scraper API
+cd "Scraper Code"
+pip install -r requirements.txt
+uvicorn server.main:app --reload --port 8000
+
+# Autofill API
+cd job-autofill-scraper
+npm run dev:backend
+
+# Unified frontend
+cd frontend
 npm run dev
 ```
 
-Open the URL shown in the terminal (default: http://localhost:5173/).
+### 4. Load Chrome extension
 
-```bash
-npm test
-npm run build
-```
-
-### Job Autofill Scraper
-
-```bash
+```powershell
 cd job-autofill-scraper
-npm install
 npm run build
-npm run dev:backend
 ```
 
-Load the unpacked extension from `job-autofill-scraper/extension/` in Chrome. See [`job-autofill-scraper/README.md`](./job-autofill-scraper/README.md) for full setup.
+Load unpacked from `job-autofill-scraper/extension/` in Chrome.
 
-## Repository layout
+## User journey
 
-```text
-jobpilot/
-├── README.md
-├── jd-match-scoring/         # Match scoring web app
-├── job-autofill-scraper/     # Autofill extension + backend + scraper
-├── JobPilot-Parser/
-└── Scraper Code/
+1. Open **http://localhost:5173** → create an account or sign in
+2. **Dashboard** shows profile strength, jobs viewed, and applied counts
+3. **Profile** → upload resume → review parsed fields → save (one profile per account)
+4. **Jobs** → browse scored listings (match ring + matched/missing skills)
+5. Click **Apply** → ATS page opens with `jp_candidate` + `jp_job` URL params, and the event is tracked
+6. **Applications** → every opened job with its match snapshot; mark viewed/applied/skipped
+7. Extension shows **match overlay** on the apply page
+8. Click **Autofill application** → form filled from saved profile
+
+## Testing
+
+```powershell
+npm test
 ```
 
-## Notes
+Runs match-core unit tests + integration smoke tests.
 
-- Each project has its own `package.json` — run `npm install` inside each folder.
-- Copy `job-autofill-scraper/.env.example` to `.env` for API/Supabase credentials (never commit `.env`).
+## API additions for integration
+
+| Service | Endpoint |
+|---------|----------|
+| Parser | `POST /auth/register` · `POST /auth/login` · `GET /auth/me` |
+| Parser | `GET /candidates/me` (auth) |
+| Parser | `POST /applications` · `GET /applications` · `PATCH /applications/{id}` (auth) |
+| Parser | `GET /candidates/{id}/match-text` |
+| Scraper | `GET /api/jobs/by-key?company_id=&source=&job_id=` |
+| Scraper | `GET /api/jobs/by-url?url=` |

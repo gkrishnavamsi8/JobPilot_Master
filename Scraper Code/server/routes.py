@@ -304,6 +304,28 @@ def get_jobs(
     return JobBrowsePage(total=total, items=[JobBrowseRow(**r) for r in rows])
 
 
+@router.get("/jobs/by-key", response_model=JobBrowseRow)
+def get_job_by_key(
+    company_id: str = Query(...),
+    source: str = Query(...),
+    job_id: str = Query(...),
+) -> JobBrowseRow:
+    store = get_store()
+    row = store.get_job_by_key(company_id, source, job_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return JobBrowseRow(**row)
+
+
+@router.get("/jobs/by-url", response_model=JobBrowseRow)
+def get_job_by_url(url: str = Query(..., description="Exact detail_url of the scraped job.")) -> JobBrowseRow:
+    store = get_store()
+    row = store.get_job_by_url(url)
+    if not row:
+        raise HTTPException(status_code=404, detail="Job not found for URL")
+    return JobBrowseRow(**row)
+
+
 @router.get("/jobs/export.xlsx")
 def export_jobs_xlsx(
     company_ids: str | None = Query(default=None),

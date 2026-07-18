@@ -49,7 +49,9 @@ export function collectFieldHints(element: Element): string[] {
 
   const container = element.closest(FIELD_CONTAINER_SELECTOR);
   if (container) {
-    const labelEl = container.querySelector(':scope > label, :scope > legend, :scope > .label');
+    const labelEl = container.querySelector(
+      ':scope > label, :scope > legend, :scope > .label, :scope [class*="label"], :scope [class*="Label"], :scope .text',
+    );
     if (labelEl && !labelEl.contains(element)) {
       push(labelEl.textContent);
     }

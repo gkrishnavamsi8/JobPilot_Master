@@ -4,79 +4,185 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JobPilot Autofill</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <main class="popup">
-      <header>
-        <h1>JobPilot</h1>
-        <p class="subtitle">Universal job form autofill</p>
-      </header>
+    <div class="jp-shell">
+      <div class="jp-panel">
+        <header class="jp-header">
+          <div class="jp-header-top">
+            <div class="jp-brand-row">
+              <div class="jp-logo" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1400" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m15 4 3 3-9 9H6v-3l9-9Z" />
+                  <path d="M9 15l-3 3" />
+                  <path d="m18 7 3 3" />
+                </svg>
+              </div>
+              <div>
+                <h1 class="jp-title">JobPilot</h1>
+                <p class="jp-subtitle">Universal job form autofill</p>
+              </div>
+            </div>
+            <button id="closePopup" type="button" class="jp-close-btn" aria-label="Close panel">×</button>
+          </div>
 
-      <section class="mode-toggle">
-        <label class="radio">
-          <input type="radio" name="dataMode" value="json" checked />
-          Paste JSON (test mode)
-        </label>
-        <label class="radio">
-          <input type="radio" name="dataMode" value="api" />
-          Fetch from API
-        </label>
-      </section>
+          <nav class="jp-stepper" aria-label="Autofill pipeline">
+            <div class="jp-step" data-step="0">
+              <span class="jp-step-icon" data-icon="dash"></span>
+              <span class="jp-step-label">Connect</span>
+            </div>
+            <div class="jp-step-line" data-line="0"></div>
+            <div class="jp-step" data-step="1">
+              <span class="jp-step-icon" data-icon="dash"></span>
+              <span class="jp-step-label">Lookup</span>
+            </div>
+            <div class="jp-step-line" data-line="1"></div>
+            <div class="jp-step" data-step="2">
+              <span class="jp-step-icon" data-icon="dash"></span>
+              <span class="jp-step-label">Fetch</span>
+            </div>
+            <div class="jp-step-line" data-line="2"></div>
+            <div class="jp-step" data-step="3">
+              <span class="jp-step-icon" data-icon="dash"></span>
+              <span class="jp-step-label">Fill</span>
+            </div>
+          </nav>
+        </header>
 
-      <section id="jsonPanel" class="panel">
-        <label>
-          Candidate JSON
-          <textarea
-            id="candidateJson"
-            rows="10"
-            spellcheck="false"
-            placeholder='Paste your candidate "data" jsonb object here…'
-          ></textarea>
-        </label>
-        <button id="loadSample" type="button" class="secondary">Load sample data</button>
-      </section>
+        <div class="jp-scroll-body">
+        <div class="jp-body">
+          <div class="jp-segment" role="tablist" aria-label="Profile source">
+            <button type="button" class="jp-segment-btn" data-source="json" role="tab" aria-selected="false">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+              Paste JSON
+            </button>
+            <button type="button" class="jp-segment-btn is-active" data-source="api" role="tab" aria-selected="true">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Fetch from API
+            </button>
+          </div>
 
-      <section id="apiPanel" class="panel hidden">
-        <label>
-          API Base URL
-          <input id="apiBaseUrl" type="url" placeholder="http://localhost:3001" />
-        </label>
-        <label>
-          API Key
-          <input id="apiKey" type="password" placeholder="Optional" autocomplete="off" />
-        </label>
-        <fieldset class="lookup-mode">
-          <legend>Lookup by</legend>
-          <label class="radio">
-            <input type="radio" name="lookupMode" value="email" checked />
-            Email
-          </label>
-          <label class="radio">
-            <input type="radio" name="lookupMode" value="id" />
-            Candidate ID
-          </label>
-        </fieldset>
-        <label id="emailLookupLabel">
-          Email
-          <input id="candidateEmail" type="email" placeholder="gangisettykrishnavamsi@gmail.com" />
-        </label>
-        <label id="idLookupLabel" class="hidden">
-          Candidate ID
-          <input id="candidateId" type="text" placeholder="UUID from candidates table" />
-        </label>
-        <button id="saveSettings" type="button" class="secondary">Save API settings</button>
-        <button id="fetchProfile" type="button" class="secondary">Fetch profile</button>
-        <p id="cacheStatus" class="cache-status" aria-live="polite"></p>
-      </section>
+          <section id="jsonPanel" class="jp-panel-section hidden">
+            <label class="jp-field">
+              <span class="jp-field-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+                Profile JSON
+              </span>
+              <textarea id="candidateJson" spellcheck="false" placeholder='{ "profile": { "first_name": "..." } }'></textarea>
+            </label>
+            <button id="loadSample" type="button" class="jp-link-btn">Load sample data</button>
+          </section>
 
-      <section class="actions">
-        <button id="fillPage" type="button" class="primary">Fill this page</button>
-        <button id="validateJson" type="button" class="secondary">Validate JSON</button>
-      </section>
+          <section id="apiPanel" class="jp-panel-section">
+            <button type="button" id="settingsToggle" class="jp-settings-toggle" aria-expanded="false">
+              <span>Connection settings</span>
+              <svg class="jp-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
 
-      <section id="status" class="status" aria-live="polite"></section>
-    </main>
+            <div id="settingsPanel" class="jp-settings-panel hidden">
+              <label class="jp-field">
+                <span class="jp-field-label">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  API base URL
+                </span>
+                <input id="apiBaseUrl" type="url" class="jp-input jp-mono" placeholder="http://localhost:3001" />
+              </label>
+              <label class="jp-field">
+                <span class="jp-field-label">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>
+                  API key <span class="jp-optional">(optional)</span>
+                </span>
+                <input id="apiKey" type="password" class="jp-input jp-mono" placeholder="Optional" autocomplete="off" />
+              </label>
+            </div>
+
+            <p class="jp-section-label">Lookup by</p>
+            <div class="jp-lookup-toggle">
+              <button type="button" class="jp-lookup-btn is-active" data-lookup="email">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                Email
+              </button>
+              <button type="button" class="jp-lookup-btn" data-lookup="id">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>
+                Candidate ID
+              </button>
+            </div>
+
+            <label id="emailLookupLabel" class="jp-field">
+              <span class="jp-field-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                Email
+              </span>
+              <input id="candidateEmail" type="email" class="jp-input" placeholder="name@company.com" />
+            </label>
+            <label id="idLookupLabel" class="jp-field hidden">
+              <span class="jp-field-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>
+                Candidate ID
+              </span>
+              <input id="candidateId" type="text" class="jp-input" placeholder="UUID from candidates table" />
+            </label>
+          </section>
+
+          <div id="profileCard" class="jp-profile-card">
+            <div id="profileIdle" class="jp-profile-idle">No profile loaded — fetch one to get started.</div>
+            <div id="profileFetching" class="jp-profile-fetching hidden">
+              <span class="jp-spinner"></span>
+              Fetching profile…
+            </div>
+            <div id="profileLoaded" class="jp-profile-loaded hidden">
+              <div id="profileAvatar" class="jp-avatar">JP</div>
+              <div class="jp-profile-meta">
+                <div id="profileName" class="jp-profile-name">—</div>
+                <div id="profileDetail" class="jp-profile-detail">—</div>
+              </div>
+              <svg id="profileFilledIcon" class="jp-filled-icon hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+            </div>
+          </div>
+
+          <div class="jp-actions">
+            <button id="fetchProfile" type="button" class="jp-btn-secondary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Fetch profile
+            </button>
+            <button id="fillPage" type="button" class="jp-btn-primary" disabled>
+              <span class="jp-ink"></span>
+              <span class="jp-btn-label">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 4 3 3-9 9H6v-3l9-9Z"/><path d="M9 15l-3 3"/><path d="m18 7 3 3"/></svg>
+                Fill this page
+              </span>
+            </button>
+            <button id="validateJson" type="button" class="jp-btn-ghost">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              Validate JSON
+            </button>
+          </div>
+
+          <div id="resultPanel" class="jp-result-panel hidden" aria-live="polite">
+            <div class="jp-result-header">
+              <span id="resultTitle" class="jp-result-title">Autofill complete</span>
+              <button id="clearResult" type="button" class="jp-result-clear" aria-label="Dismiss result">×</button>
+            </div>
+            <div class="jp-result-stats">
+              <span class="jp-stat jp-stat-success"><strong id="statFilled">0</strong> filled</span>
+              <span class="jp-stat jp-stat-muted"><strong id="statSkipped">0</strong> skipped</span>
+              <span class="jp-stat jp-stat-error"><strong id="statFailed">0</strong> failed</span>
+            </div>
+            <div id="resultFailures" class="jp-result-list hidden"></div>
+          </div>
+
+          <p id="status" class="jp-status" aria-live="polite"></p>
+        </div>
+        </div>
+      </div>
+    </div>
     <script src="popup.js" type="module"></script>
   </body>
 </html>

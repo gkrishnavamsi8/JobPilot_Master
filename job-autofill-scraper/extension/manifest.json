@@ -1,17 +1,22 @@
 {
   "manifest_version": 3,
   "name": "JobPilot Autofill",
-  "version": "0.3.2",
-  "description": "Auto-fill job application forms on any job board from your stored candidate profile.",
+  "version": "1.0.0",
+  "description": "Integrated JobPilot extension — match score overlay + autofill on Workday/Greenhouse.",
   "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": [
     "http://localhost:3001/*",
     "http://127.0.0.1:3001/*",
+    "http://localhost:8000/*",
+    "http://127.0.0.1:8000/*",
+    "http://localhost:5173/*",
+    "http://127.0.0.1:5173/*",
     "https://*.greenhouse.io/*",
     "https://*.myworkdayjobs.com/*",
     "https://*.wd1.myworkdayjobs.com/*",
     "https://*.wd3.myworkdayjobs.com/*",
-    "https://*.wd5.myworkdayjobs.com/*"
+    "https://*.wd5.myworkdayjobs.com/*",
+    "https://target.wd5.myworkdayjobs.com/*"
   ],
   "background": {
     "service_worker": "background/service-worker.js",

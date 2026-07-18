@@ -1,137 +1,631 @@
 :root {
-  color-scheme: light dark;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --jp-bg: #0b0d10;
+  --jp-panel: #15181d;
+  --jp-surface: #1b1f26;
+  --jp-border: #262b33;
+  --jp-border-soft: #1f232a;
+  --jp-text: #f2f3f5;
+  --jp-muted: #8b93a1;
+  --jp-dim: #6b7280;
+  --jp-dimmer: #565e6b;
+  --jp-gold: #f2b84b;
+  --jp-gold-dark: #d9a23b;
+  --jp-gold-text: #1a1400;
+  --jp-success: #4ade80;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  min-width: 360px;
+  min-width: 380px;
+  max-height: 600px;
+  overflow: hidden;
+  background: var(--jp-bg);
+  color: var(--jp-text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.popup {
-  padding: 16px;
+.jp-shell {
+  padding: 0;
+  height: 100%;
 }
 
-header h1 {
-  margin: 0;
-  font-size: 1.1rem;
-}
-
-.subtitle {
-  margin: 4px 0 12px;
-  color: #666;
-  font-size: 0.85rem;
-}
-
-.mode-toggle {
+.jp-panel {
+  width: 380px;
+  max-height: 600px;
+  background: var(--jp-panel);
+  border: 1px solid var(--jp-border);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
   display: flex;
-  gap: 12px;
-  margin-bottom: 12px;
-  font-size: 0.85rem;
+  flex-direction: column;
 }
 
-.radio {
+.jp-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--jp-border-soft);
+  background: linear-gradient(180deg, rgba(242, 184, 75, 0.06), transparent);
+  flex-shrink: 0;
+}
+
+.jp-header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.jp-close-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--jp-border);
+  border-radius: 8px;
+  background: var(--jp-surface);
+  color: var(--jp-muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.jp-close-btn:hover {
+  color: var(--jp-text);
+  border-color: var(--jp-gold);
+}
+
+.jp-scroll-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: var(--jp-gold) var(--jp-surface);
+}
+
+.jp-scroll-body::-webkit-scrollbar {
+  width: 10px;
+}
+
+.jp-scroll-body::-webkit-scrollbar-track {
+  background: var(--jp-surface);
+  border-left: 1px solid var(--jp-border-soft);
+}
+
+.jp-scroll-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--jp-gold), var(--jp-gold-dark));
+  border-radius: 999px;
+  border: 2px solid var(--jp-surface);
+}
+
+.jp-scroll-body::-webkit-scrollbar-thumb:hover {
+  background: var(--jp-gold);
+}
+
+.jp-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.jp-logo {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--jp-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.jp-title {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.jp-subtitle {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  color: var(--jp-dim);
+}
+
+.jp-stepper {
+  display: flex;
+  align-items: center;
+  margin-top: 18px;
+  gap: 4px;
+}
+
+.jp-step {
   display: flex;
   align-items: center;
   gap: 6px;
+  min-width: 0;
 }
 
-.panel {
+.jp-step-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  color: var(--jp-dimmer);
+}
+
+.jp-step.is-active .jp-step-icon,
+.jp-step.is-done .jp-step-icon {
+  color: var(--jp-gold);
+}
+
+.jp-step-label {
+  font-size: 10.5px;
+  font-family: 'IBM Plex Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--jp-dimmer);
+  white-space: nowrap;
+}
+
+.jp-step.is-active .jp-step-label,
+.jp-step.is-done .jp-step-label {
+  color: var(--jp-gold);
+}
+
+.jp-step-line {
+  flex: 1;
+  height: 1px;
+  background: var(--jp-border);
+}
+
+.jp-step-line.is-done {
+  background: var(--jp-gold);
+  opacity: 0.5;
+}
+
+.jp-body {
+  padding: 18px 20px 20px;
+}
+
+.jp-segment {
+  display: flex;
+  background: var(--jp-surface);
+  border: 1px solid var(--jp-border);
+  border-radius: 9px;
+  padding: 3px;
+  margin-bottom: 16px;
+}
+
+.jp-segment-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 500;
+  background: transparent;
+  color: var(--jp-muted);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.jp-segment-btn.is-active {
+  background: var(--jp-gold);
+  color: var(--jp-gold-text);
+}
+
+.jp-settings-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0 10px;
+  color: var(--jp-muted);
+  font-size: 11.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.jp-chevron {
+  transition: transform 0.15s ease;
+}
+
+.jp-settings-toggle[aria-expanded='true'] .jp-chevron {
+  transform: rotate(180deg);
+}
+
+.jp-settings-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.jp-section-label {
+  margin: 0 0 8px;
+  font-size: 11.5px;
+  color: var(--jp-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.jp-lookup-toggle {
+  display: flex;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
-label {
-  display: block;
-  margin-bottom: 10px;
-  font-size: 0.8rem;
-}
-
-input,
-textarea {
-  display: block;
-  width: 100%;
-  margin-top: 4px;
-  padding: 8px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.75rem;
-}
-
-textarea {
-  resize: vertical;
-  min-height: 160px;
-}
-
-.actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-button {
+.jp-lookup-btn {
   flex: 1;
-  padding: 10px 12px;
-  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px;
   border-radius: 8px;
   cursor: pointer;
-  font-weight: 600;
+  font-size: 12.5px;
+  font-weight: 500;
+  border: 1px solid var(--jp-border);
+  background: var(--jp-surface);
+  color: var(--jp-muted);
 }
 
-button.primary {
-  background: #2563eb;
-  color: white;
+.jp-lookup-btn.is-active {
+  border-color: var(--jp-gold);
+  background: rgba(242, 184, 75, 0.08);
+  color: var(--jp-gold);
 }
 
-button.secondary {
-  background: #e5e7eb;
-  color: #111;
+.jp-field {
+  display: block;
+  margin-bottom: 12px;
 }
 
-.status {
-  margin-top: 12px;
-  font-size: 0.8rem;
-  min-height: 1.2em;
-  white-space: pre-wrap;
-}
-
-.status.error {
-  color: #b91c1c;
-}
-
-.status.success {
-  color: #15803d;
-}
-
-.lookup-mode {
-  border: none;
-  margin: 0 0 10px;
-  padding: 0;
-}
-
-.lookup-mode legend {
-  font-size: 0.8rem;
-  font-weight: 600;
+.jp-field-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--jp-muted);
+  font-weight: 500;
   margin-bottom: 6px;
 }
 
-.hidden {
-  display: none;
+.jp-optional {
+  color: var(--jp-dimmer);
 }
 
-.cache-status {
-  margin: 10px 0 0;
-  font-size: 0.75rem;
-  color: #666;
-  line-height: 1.35;
-}
-
-.cache-status.ready {
-  color: #15803d;
-}
-
-#fetchProfile {
-  margin-top: 8px;
+.jp-input,
+.jp-field textarea {
   width: 100%;
+  background: var(--jp-surface);
+  border: 1px solid var(--jp-border);
+  border-radius: 8px;
+  color: var(--jp-text);
+  padding: 10px 12px;
+  font-size: 13px;
+  outline: none;
+}
+
+.jp-input:focus,
+.jp-field textarea:focus {
+  border-color: var(--jp-gold);
+  box-shadow: 0 0 0 3px rgba(242, 184, 75, 0.12);
+}
+
+.jp-mono {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.jp-field textarea {
+  min-height: 110px;
+  resize: vertical;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.jp-link-btn {
+  background: none;
+  border: none;
+  color: var(--jp-gold);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+  margin-top: -4px;
+  margin-bottom: 8px;
+}
+
+.jp-profile-card {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--jp-border);
+  background: var(--jp-surface);
+  min-height: 56px;
+}
+
+.jp-profile-idle {
+  font-size: 12.5px;
+  color: var(--jp-dim);
+}
+
+.jp-profile-fetching {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--jp-gold);
+}
+
+.jp-profile-loaded {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.jp-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(242, 184, 75, 0.15);
+  color: var(--jp-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.jp-profile-meta {
+  min-width: 0;
+  flex: 1;
+}
+
+.jp-profile-name {
+  font-size: 13px;
+  color: var(--jp-text);
+  font-weight: 500;
+}
+
+.jp-profile-detail {
+  font-size: 11.5px;
+  color: var(--jp-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jp-filled-icon {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.jp-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.jp-btn-secondary,
+.jp-btn-primary,
+.jp-btn-ghost {
+  width: 100%;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.jp-btn-secondary {
+  padding: 10px;
+  border: 1px solid var(--jp-border);
+  background: var(--jp-surface);
+  color: var(--jp-text);
+}
+
+.jp-btn-primary {
+  position: relative;
+  overflow: hidden;
+  padding: 12px;
+  border: none;
+  background: var(--jp-gold);
+  color: var(--jp-gold-text);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.jp-btn-primary:disabled {
+  background: #3a3120;
+  color: #7a6b45;
+  cursor: not-allowed;
+}
+
+.jp-btn-primary.is-filling .jp-ink {
+  transform: translateX(0);
+}
+
+.jp-ink {
+  position: absolute;
+  inset: 0;
+  background: var(--jp-gold-dark);
+  transform: translateX(-100%);
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.jp-btn-label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jp-btn-ghost {
+  padding: 9px;
+  border: 1px solid var(--jp-border);
+  background: transparent;
+  color: var(--jp-muted);
+  font-size: 12.5px;
+}
+
+.jp-status {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: var(--jp-muted);
+  white-space: pre-wrap;
+  min-height: 1em;
+}
+
+.jp-status.error {
+  color: #f87171;
+}
+
+.jp-status.success {
+  color: var(--jp-success);
+}
+
+.jp-result-panel {
+  margin-top: 14px;
+  border: 1px solid var(--jp-border);
+  border-radius: 12px;
+  background: var(--jp-surface);
+  overflow: hidden;
+}
+
+.jp-result-panel.is-error {
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+.jp-result-panel.is-success {
+  border-color: rgba(74, 222, 128, 0.35);
+}
+
+.jp-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--jp-border);
+  background: rgba(242, 184, 75, 0.06);
+}
+
+.jp-result-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--jp-text);
+}
+
+.jp-result-clear {
+  border: none;
+  background: transparent;
+  color: var(--jp-muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.jp-result-stats {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  flex-wrap: wrap;
+}
+
+.jp-stat {
+  font-size: 11.5px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--jp-border);
+  color: var(--jp-muted);
+}
+
+.jp-stat strong {
+  color: var(--jp-text);
+}
+
+.jp-stat-success {
+  border-color: rgba(74, 222, 128, 0.35);
+  color: #86efac;
+}
+
+.jp-stat-error {
+  border-color: rgba(248, 113, 113, 0.35);
+  color: #fca5a5;
+}
+
+.jp-result-list {
+  max-height: 140px;
+  overflow-y: auto;
+  padding: 0 12px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--jp-gold) transparent;
+}
+
+.jp-result-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.jp-result-list::-webkit-scrollbar-thumb {
+  background: var(--jp-gold-dark);
+  border-radius: 999px;
+}
+
+.jp-failure-item {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 8px 10px;
+  margin-top: 6px;
+  border-radius: 8px;
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.jp-failure-field {
+  font-family: 'IBM Plex Mono', monospace;
+  color: #fecaca;
+  flex-shrink: 0;
+}
+
+.jp-failure-message {
+  color: #fda4af;
+  word-break: break-word;
+}
+
+.jp-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(242, 184, 75, 0.25);
+  border-top-color: var(--jp-gold);
+  border-radius: 50%;
+  animation: jp-spin 0.8s linear infinite;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@keyframes jp-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

@@ -35,6 +35,24 @@ export function findBestMatchingOption(
   options: Element[],
   desired: string
 ): Element | undefined {
+  return findBestMatchingOptionFromTerms(options, [desired]);
+}
+
+export function findBestMatchingOptionFromTerms(
+  options: Element[],
+  desiredTerms: string[],
+): Element | undefined {
+  for (const desired of desiredTerms) {
+    const match = findBestMatchingOptionSingle(options, desired);
+    if (match) return match;
+  }
+  return undefined;
+}
+
+function findBestMatchingOptionSingle(
+  options: Element[],
+  desired: string,
+): Element | undefined {
   const desiredNorm = normalizeMatchText(desired);
   if (!desiredNorm) return undefined;
 
@@ -49,6 +67,8 @@ export function findBestMatchingOption(
     if (norm === desiredNorm) score = 100;
     else if (norm.startsWith(`${desiredNorm} `) || norm.startsWith(`${desiredNorm}(`)) score = 90;
     else if (containsWholeWord(norm, desiredNorm)) score = 70;
+    else if (desiredNorm.startsWith('+') && norm.includes(desiredNorm)) score = 88;
+    else if (desiredNorm.startsWith('(') && norm.includes(desiredNorm)) score = 88;
     else if (desiredNorm.length >= 5 && norm.includes(desiredNorm)) score = 30;
 
     if (score > 0 && (!best || score > best.score)) {

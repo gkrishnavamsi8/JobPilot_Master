@@ -30,6 +30,13 @@ export const UNIVERSAL_FIELD_MAPPINGS: FieldMapping[] = [
     fieldType: 'text',
   },
   {
+    labelSynonyms: ['phone device type', 'phone type', 'device type', 'type of phone'],
+    namePattern: /phone.*device|device.*type|phone_type|phonetype/i,
+    idPattern: /phone.*device|device.*type|phone_type/i,
+    jsonPath: 'profile.phone.type',
+    fieldType: 'dropdown',
+  },
+  {
     labelSynonyms: ['phone number', 'phone'],
     namePattern: /(?:^|\[)(?:phone[_-]?number|phone)(?:\]|$)/i,
     idPattern: /^phone(?:[_-]?number)?$/i,
@@ -44,7 +51,7 @@ export const UNIVERSAL_FIELD_MAPPINGS: FieldMapping[] = [
     fieldType: 'dropdown',
   },
   {
-    labelSynonyms: ['country'],
+    labelSynonyms: ['country', 'country/region', 'country or region', 'country region'],
     namePattern: /(?:^|\[)country(?:\]|$)|^country$/i,
     idPattern: /^country$/i,
     automationIdPattern: /^country$/i,

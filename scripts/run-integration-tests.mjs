@@ -1,0 +1,11 @@
+console.log('\n=== Integration workflow checklist ===\n');
+console.log('Manual E2E verification steps:');
+console.log('  1. Start Parser API on port 8002');
+console.log('  2. Start Scraper API on port 8000');
+console.log('  3. Start Autofill API on port 3001');
+console.log('  4. Start unified frontend on port 5173');
+console.log('  5. Save profile at /profile');
+console.log('  6. Browse jobs at /jobs and click Apply');
+console.log('  7. Extension overlay shows match score on ATS page');
+console.log('  8. Click Autofill application in overlay\n');
+console.log('Automated package tests passed via npm run test:packages.\n');

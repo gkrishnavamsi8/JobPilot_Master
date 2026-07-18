@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand — indigo core */
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-200: #c7d2fe;
+  --color-brand-300: #a5b4fc;
+  --color-brand-400: #818cf8;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+  --color-brand-800: #3730a3;
+  --color-brand-900: #312e81;
+
+  /* Accent — cyan for gradients and highlights */
+  --color-accent-300: #67e8f9;
+  --color-accent-400: #22d3ee;
+  --color-accent-500: #06b6d4;
+
+  /* Surfaces */
+  --color-surface: #070b14;
+  --color-panel: #0d1322;
+  --color-panel-2: #111a2e;
+  --color-panel-border: #1c2740;
+  --color-ink: #e7ecf5;
+  --color-ink-2: #94a3b8;
+  --color-ink-3: #64748b;
+
+  --shadow-glow: 0 0 40px 0 rgb(99 102 241 / 0.25);
+
+  --animate-fade-up: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade-in: fade-in 0.4s ease both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-ink font-sans antialiased min-h-screen;
+  }
+
+  ::selection {
+    @apply bg-brand-500/40 text-white;
+  }
+}
+
+/* Slim, recessive scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #263452 transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #263452;
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@layer base {
+  input,
+  select,
+  textarea {
+    @apply bg-panel-2/80 border border-panel-border rounded-xl px-3.5 py-2.5 text-sm text-ink
+      placeholder:text-ink-3 outline-none transition
+      focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25;
+  }
+
+  input[type="checkbox"] {
+    @apply h-4 w-4 rounded-md p-0 accent-indigo-500;
+  }
+
+  label {
+    @apply text-xs font-semibold uppercase tracking-wider text-ink-2;
+  }
+}
+
+.card {
+  @apply rounded-2xl border border-panel-border bg-panel/85 backdrop-blur-sm shadow-xl shadow-black/25;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500
+    px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/30 transition
+    hover:from-brand-500 hover:to-accent-500 hover:shadow-glow
+    focus-visible:ring-2 focus-visible:ring-brand-400 disabled:pointer-events-none disabled:opacity-50;
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl border border-panel-border bg-panel-2/50
+    px-4 py-2.5 text-sm font-medium text-ink-2 transition
+    hover:border-brand-500/50 hover:bg-panel-2 hover:text-ink disabled:pointer-events-none disabled:opacity-50;
+}
+
+.chip {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium;
+}
+
+.autofill-badge {
+  @apply inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-400;
+}
