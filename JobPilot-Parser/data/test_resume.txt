@@ -1,0 +1,9 @@
+﻿Gaurav Pampana
+gaurav@gmail.com | +91 9876543210 | linkedin.com/in/gaurav
+Senior Software Developer
+Bajaj Finance
+Jan 2025 - Present
+Vellore Institute of Technology
+B.Tech Electronics and Communication Engineering
+2023
+Python, Java, Kafka, Spark, Redis, REST APIs
