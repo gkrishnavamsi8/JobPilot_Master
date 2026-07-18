@@ -15,7 +15,7 @@ import {
   updateApplicationStatus,
   type ApplicationStatus,
   type JobApplication,
-} from '../lib/applicationsApi';
+} from '../lib/api';
 
 const STATUS_META: Record<
   ApplicationStatus,

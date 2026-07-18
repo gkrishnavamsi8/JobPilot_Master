@@ -1,7 +1,13 @@
 import { useMemo, useRef, useState } from 'react';
-import { analyzeMatch, type AnalyzeMatchOutput } from './lib/jdMatchService';
-import { getMatchedAliasForSkill } from './lib/skillExtractor';
-import { getSupportedResumeExtensions, parseResumeFile } from './lib/resumeParser';
+import {
+  analyzeMatch,
+  getMatchedAliasForSkill,
+  type AnalyzeMatchOutput,
+} from '@jobpilot/match-core';
+import {
+  getSupportedResumeExtensions,
+  parseResumeFile,
+} from '@jobpilot/match-core/resumeParser';
 
 const SAMPLE_SUMMARY = `Senior Software Engineer with 8+ years building distributed systems.
 Strong in Java, Spring Boot, Kafka, Docker, AWS, and microservices architecture.

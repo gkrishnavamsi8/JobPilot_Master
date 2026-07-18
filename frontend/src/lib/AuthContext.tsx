@@ -16,7 +16,7 @@ import {
   register as apiRegister,
   storeSession,
   type User,
-} from './authApi';
+} from './api';
 import { clearStoredCandidate } from './session';
 
 interface AuthContextValue {

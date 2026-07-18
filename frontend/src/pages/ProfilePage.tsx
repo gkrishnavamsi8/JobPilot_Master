@@ -6,7 +6,7 @@ import {
   WifiOff,
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { checkHealth, getMyCandidate, parseResume, saveCandidate } from '../api';
+import { checkHealth, getMyCandidate, parseResume, saveCandidate } from '../lib/api';
 import { CandidateForm } from '../components/CandidateForm';
 import { ResumeUpload } from '../components/ResumeUpload';
 import { setStoredCandidate } from '../lib/session';

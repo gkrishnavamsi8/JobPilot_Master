@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchApplications, type JobApplication } from '../lib/applicationsApi';
+import { fetchApplications, type JobApplication } from '../lib/api';
 import { useAuth } from '../lib/AuthContext';
 import { useCandidate } from '../lib/useCandidate';
 import type { CandidateData } from '../types';

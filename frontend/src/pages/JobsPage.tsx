@@ -18,8 +18,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { ScrapedJob } from '@jobpilot/shared-types';
 import { ScoreRing } from '../components/ScoreRing';
-import { logApplication } from '../lib/applicationsApi';
-import { fetchJobs } from '../lib/scraperApi';
+import { fetchJobs, logApplication } from '../lib/api';
 import { SAMPLE_JOBS } from '../lib/sampleJobs';
 import { useCandidate } from '../lib/useCandidate';
 

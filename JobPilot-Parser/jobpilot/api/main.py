@@ -42,7 +42,7 @@ from jobpilot.services.candidates import (
 )
 from jobpilot.services.match_text import build_match_text
 from jobpilot.services.merge import merge_candidate_data
-from jobpilot.services.resume import parse_resume_bytes, parse_resume_text
+from jobpilot.services.resume import parse_resume_bytes
 from jobpilot.services.text_extract import extract_text_from_bytes
 
 

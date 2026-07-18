@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getMyCandidate } from '../api';
+import { getMyCandidate } from './api';
 import type { CandidateData } from '../types';
 import { getStoredCandidateData, getStoredCandidateId, setStoredCandidate } from './session';
 
