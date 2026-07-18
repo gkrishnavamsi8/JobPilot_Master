@@ -7,8 +7,8 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      '@jobpilot/match-core': path.resolve(__dirname, '../packages/match-core/src/index.ts'),
-      '@jobpilot/shared-types': path.resolve(__dirname, '../packages/shared-types/src/index.ts'),
+      '@jobpilot/match-core': path.resolve(__dirname, '../../packages/match-core/src/index.ts'),
+      '@jobpilot/shared-types': path.resolve(__dirname, '../../packages/shared-types/src/index.ts'),
     },
   },
   server: {

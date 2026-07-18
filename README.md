@@ -5,27 +5,29 @@ End-to-end job search workflow:
 **Sign in → Parse resume → Scrape jobs → Preview match → Apply & track → Extension overlay → Autofill**
 
 The unified web app has account login (register/sign-in), a dashboard, profile
-(resume parsing), a scored job browser, and an application tracker. The Parser
-API owns auth (`/auth/register`, `/auth/login`, `/auth/me`) and application
-logging (`/applications`); tokens are HMAC-signed — set `SECRET_KEY` in
-`JobPilot-Parser/.env` for production. The Parser runs on SQLite out of the box,
-so login → profile → jobs → applications works with no Supabase configured
-(the job browser falls back to labeled sample listings until the Scraper API
-is up).
+(resume parsing), a scored job browser, a scraper admin page, and an application
+tracker. The Parser API owns auth (`/auth/register`, `/auth/login`, `/auth/me`)
+and application logging (`/applications`); tokens are HMAC-signed — set
+`SECRET_KEY` in `apps/parser-api/.env` for production. The Parser runs on SQLite
+out of the box, so login → profile → jobs → applications works with no Supabase
+configured (the job browser falls back to labeled sample listings until the
+Scraper API is up).
 
-## Projects
+## Repository layout
 
-| Path | Role |
-|------|------|
-| `JobPilot-Parser/` | Step 1 — Resume parsing API (port **8002**) |
-| `Scraper Code/` | Step 2 — Job scraper API (port **8000**) |
-| `frontend/` | Steps 1+3 — Unified UI (Profile + Jobs, port **5173**) |
-| `packages/match-core/` | Shared JD match scoring library |
-| `packages/shared-types/` | Shared candidate/job types + helpers |
-| `job-autofill-scraper/` | Steps 4+5 — Extension + autofill API (port **3001**) |
-| `jd-match-scoring/` | Standalone scoring sandbox |
-
-See [`docs/INTEGRATION_PLAN.md`](./docs/INTEGRATION_PLAN.md) for architecture details.
+```text
+apps/
+  web/                 Unified React frontend (port 5173)
+  parser-api/          Resume parsing + auth + applications API (FastAPI, port 8002)
+  scraper-api/         Job scraper API (FastAPI, port 8000)
+  autofill-extension/  Chrome extension + autofill API (port 3001)
+  match-sandbox/       Standalone JD-match scoring playground
+packages/
+  match-core/          Shared JD match scoring library
+  shared-types/        Shared candidate/job types + helpers
+docs/                  Architecture and integration plan
+scripts/               Monorepo-level scripts
+```
 
 ## Quick start
 
@@ -38,14 +40,14 @@ copy .env.example .env
 ```
 
 Configure Supabase credentials in:
-- `JobPilot-Parser/.env`
-- `Scraper Code/.env`
-- `job-autofill-scraper/.env`
+- `apps/parser-api/.env`
+- `apps/scraper-api/.env`
+- `apps/autofill-extension/.env`
 
 ### 2. Install JS dependencies
 
 ```powershell
-cd D:\Projects\JobPilot-Master
+cd D:\JobPilot_Master
 npm install
 ```
 
@@ -53,32 +55,31 @@ npm install
 
 ```powershell
 # Parser API
-cd JobPilot-Parser
+cd apps/parser-api
 pip install -r requirements.txt && pip install -e .
 uvicorn jobpilot.api.main:app --reload --port 8002
 
 # Scraper API
-cd "Scraper Code"
+cd apps/scraper-api
 pip install -r requirements.txt
 uvicorn server.main:app --reload --port 8000
 
 # Autofill API
-cd job-autofill-scraper
+cd apps/autofill-extension
 npm run dev:backend
 
 # Unified frontend
-cd frontend
+cd apps/web
 npm run dev
 ```
 
 ### 4. Load Chrome extension
 
 ```powershell
-cd job-autofill-scraper
-npm run build
+npm run build:extension
 ```
 
-Load unpacked from `job-autofill-scraper/extension/` in Chrome.
+Load unpacked from `apps/autofill-extension/extension/` in Chrome.
 
 ## User journey
 
@@ -86,12 +87,11 @@ Load unpacked from `job-autofill-scraper/extension/` in Chrome.
 2. **Dashboard** shows profile strength, jobs viewed, and applied counts
 3. **Profile** → upload resume → review parsed fields → save (one profile per account)
 4. **Jobs** → browse scored listings (match ring + matched/missing skills)
-   - **Scraper** → admin page to run scrapes from the UI: pick a company, set filters, watch the run live
-
-5. Click **Apply** → ATS page opens with `jp_candidate` + `jp_job` URL params, and the event is tracked
-6. **Applications** → every opened job with its match snapshot; mark viewed/applied/skipped
-7. Extension shows **match overlay** on the apply page
-8. Click **Autofill application** → form filled from saved profile
+5. **Scraper** → admin page to run scrapes from the UI: pick a company, set filters, watch the run live
+6. Click **Apply** → ATS page opens with `jp_candidate` + `jp_job` URL params, and the event is tracked
+7. **Applications** → every opened job with its match snapshot; mark viewed/applied/skipped
+8. Extension shows **match overlay** on the apply page
+9. Click **Autofill application** → form filled from saved profile
 
 ## Testing
 

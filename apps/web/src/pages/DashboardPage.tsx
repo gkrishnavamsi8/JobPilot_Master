@@ -84,7 +84,7 @@ export function DashboardPage() {
       text: 'Match overlay + form autofill on Workday & Greenhouse.',
       done: false,
       to: null,
-      cta: 'Load from job-autofill-scraper/extension',
+      cta: 'Load from apps/autofill-extension/extension',
     },
   ];
 
@@ -238,7 +238,7 @@ export function DashboardPage() {
             <h4 className="font-semibold text-white">Chrome extension completes the loop</h4>
             <p className="mt-0.5 text-sm text-ink-2">
               Build it with <code className="rounded bg-panel-2 px-1.5 py-0.5 text-xs">npm run build:extension</code>,
-              then load <code className="rounded bg-panel-2 px-1.5 py-0.5 text-xs">job-autofill-scraper/extension</code> unpacked
+              then load <code className="rounded bg-panel-2 px-1.5 py-0.5 text-xs">apps/autofill-extension/extension</code> unpacked
               — it shows the match overlay and autofills applications.
             </p>
           </div>

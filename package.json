@@ -3,11 +3,11 @@
   "private": true,
   "version": "1.0.0",
   "workspaces": [
-    "frontend",
+    "apps/web",
     "packages/match-core",
     "packages/shared-types",
-    "job-autofill-scraper",
-    "jd-match-scoring"
+    "apps/autofill-extension",
+    "apps/match-sandbox"
   ],
   "scripts": {
     "test": "npm run test:packages && npm run test:integration",

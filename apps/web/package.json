@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@jobpilot/match-core": "file:../packages/match-core",
-    "@jobpilot/shared-types": "file:../packages/shared-types",
+    "@jobpilot/match-core": "file:../../packages/match-core",
+    "@jobpilot/shared-types": "file:../../packages/shared-types",
     "lucide-react": "^0.468.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

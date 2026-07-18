@@ -1,5 +1,5 @@
-import { analyzeMatch } from '../../../packages/match-core/src/index.ts';
-import { buildUserMatchText, parseJobKey } from '../../../packages/shared-types/src/index.ts';
+import { analyzeMatch } from '../../../../packages/match-core/src/index.ts';
+import { buildUserMatchText, parseJobKey } from '../../../../packages/shared-types/src/index.ts';
 import { runFillEngine } from '../../scraper/src/fill-engine/index.ts';
 import type { CandidateData } from '../../shared/src/profile.ts';
 

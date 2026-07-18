@@ -1,5 +1,5 @@
 (() => {
-  // ../packages/match-core/src/data/skillAliases.json
+  // ../../packages/match-core/src/data/skillAliases.json
   var skillAliases_default = {
     JavaScript: ["JS", "Javascript", "ECMAScript", "ES6", "ES2015"],
     TypeScript: ["TS"],
@@ -89,7 +89,7 @@
     "Pair Programming": ["Pair-Programming"]
   };
 
-  // ../packages/match-core/src/data/skillsTaxonomy.json
+  // ../../packages/match-core/src/data/skillsTaxonomy.json
   var skillsTaxonomy_default = [
     "Java",
     "Python",
@@ -292,13 +292,13 @@
     "Pair Programming"
   ];
 
-  // ../packages/match-core/src/skillsTaxonomy.ts
+  // ../../packages/match-core/src/skillsTaxonomy.ts
   var SKILLS_TAXONOMY = skillsTaxonomy_default;
   function getSkillsTaxonomy() {
     return SKILLS_TAXONOMY;
   }
 
-  // ../packages/match-core/src/skillAliases.ts
+  // ../../packages/match-core/src/skillAliases.ts
   var cachedAliasMap = null;
   function buildValidatedAliasMap() {
     const taxonomySet = new Set(SKILLS_TAXONOMY);
@@ -324,7 +324,7 @@
     return [skill, ...aliases].sort((a, b) => b.length - a.length);
   }
 
-  // ../packages/match-core/src/skillExtractor.ts
+  // ../../packages/match-core/src/skillExtractor.ts
   function escapeRegex(value) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
@@ -364,7 +364,7 @@
     return filterSubsumedSkills(found);
   }
 
-  // ../packages/match-core/src/matchScorer.ts
+  // ../../packages/match-core/src/matchScorer.ts
   var REQUIRED_SECTION_PATTERN = /(?:^|\n)\s*(?:required|must[\s-]*have|minimum\s+qualifications|basic\s+qualifications|essential)[^\n]*\n([\s\S]*?)(?=(?:^|\n)\s*(?:nice\s+to\s+have|preferred|bonus|desired|optional|qualifications)[^\n]*\n|$)/gi;
   var PREFERRED_SECTION_PATTERN = /(?:^|\n)\s*(?:nice\s+to\s+have|preferred|bonus|desired|optional)[^\n]*\n([\s\S]*?)(?=(?:^|\n)\s*(?:required|must[\s-]*have|minimum\s+qualifications|responsibilities|about)[^\n]*\n|$)/gi;
   function sortSkills(skills) {
@@ -465,7 +465,7 @@
     };
   }
 
-  // ../packages/match-core/src/jdMatchService.ts
+  // ../../packages/match-core/src/jdMatchService.ts
   var taxonomy = getSkillsTaxonomy();
   function analyzeMatch(input) {
     const userSkills = extractSkills(input.professionalSummary, taxonomy);
@@ -493,7 +493,7 @@
     };
   }
 
-  // ../packages/shared-types/src/matchText.ts
+  // ../../packages/shared-types/src/matchText.ts
   function buildUserMatchText2(candidate) {
     const parts = [];
     if (candidate.profile?.summary?.trim()) {
@@ -520,7 +520,7 @@
     return parts.join("\n");
   }
 
-  // ../packages/shared-types/src/jobKey.ts
+  // ../../packages/shared-types/src/jobKey.ts
   function parseJobKey(key) {
     const parts = key.split(":");
     if (parts.length < 3) {
