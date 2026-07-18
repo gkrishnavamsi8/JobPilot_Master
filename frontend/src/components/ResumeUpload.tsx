@@ -1,4 +1,4 @@
-import { FileUp, Loader2, Sparkles } from "lucide-react";
+﻿import { FileUp, Loader2, Sparkles } from "lucide-react";
 import { useCallback, useState } from "react";
 
 interface Props {
@@ -31,24 +31,24 @@ export function ResumeUpload({ onFile, loading, fileName }: Props) {
       className={`relative overflow-hidden rounded-2xl border-2 border-dashed p-8 text-center transition ${
         drag
           ? "border-brand-400 bg-brand-500/10"
-          : "border-slate-700 bg-gradient-to-br from-slate-900/80 to-panel/80"
+          : "border-panel-border bg-gradient-to-br from-panel-2/80 to-panel/80"
       }`}
     >
       <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-brand-500/10 blur-2xl" />
       <div className="relative mx-auto flex max-w-md flex-col items-center gap-4">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500/20 text-brand-400">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500/20 text-brand-300">
           {loading ? <Loader2 className="h-7 w-7 animate-spin" /> : <FileUp className="h-7 w-7" />}
         </div>
         <div>
           <h3 className="text-lg font-semibold text-white">Upload your resume</h3>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-ink-2">
             PDF or DOCX — we&apos;ll auto-fill name, contact, experience, education & skills
           </p>
         </div>
         {fileName && (
-          <p className="rounded-lg bg-slate-800/80 px-3 py-1.5 text-sm text-brand-300">{fileName}</p>
+          <p className="rounded-lg bg-panel-2 px-3 py-1.5 text-sm text-brand-300">{fileName}</p>
         )}
-        <label className="cursor-pointer rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 transition hover:bg-brand-500">
+        <label className="btn-primary cursor-pointer px-5">
           <span className="flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
             {loading ? "Parsing…" : "Choose file"}

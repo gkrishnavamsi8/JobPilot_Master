@@ -1,4 +1,4 @@
-import {
+﻿import {
   Briefcase,
   GraduationCap,
   MessageSquare,
@@ -145,11 +145,11 @@ export function CandidateForm({ data, filled, onChange }: Props) {
         icon={<Briefcase className="h-5 w-5" />}
       >
         {(data.work_experience ?? []).length === 0 && (
-          <p className="mb-4 text-sm text-slate-500">No experience parsed — add manually below.</p>
+          <p className="mb-4 text-sm text-ink-3">No experience parsed — add manually below.</p>
         )}
         <div className="flex flex-col gap-4">
           {(data.work_experience ?? []).map((exp, i) => (
-            <div key={i} className="rounded-xl border border-slate-700/60 bg-slate-900/40 p-4">
+            <div key={i} className="rounded-xl border border-panel-border bg-panel-2/50 p-4">
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Job title">
                   <input
@@ -212,11 +212,11 @@ export function CandidateForm({ data, filled, onChange }: Props) {
                   />
                 </Field>
               </div>
-              <label className="mt-3 flex items-center gap-2 text-sm text-slate-300">
+              <label className="mt-3 flex items-center gap-2 text-sm text-ink-2">
                 <input
                   type="checkbox"
                   checked={exp.is_current ?? false}
-                  className="rounded border-slate-600"
+                  className="rounded border-panel-border"
                   onChange={(e) => {
                     const list = [...(data.work_experience ?? [])];
                     list[i] = { ...exp, is_current: e.target.checked, end_date: null };
@@ -230,7 +230,7 @@ export function CandidateForm({ data, filled, onChange }: Props) {
         </div>
         <button
           type="button"
-          className="mt-4 text-sm font-medium text-brand-400 hover:text-brand-300"
+          className="mt-4 text-sm font-semibold text-brand-300 hover:text-brand-200"
           onClick={() =>
             onChange({
               ...data,
@@ -248,7 +248,7 @@ export function CandidateForm({ data, filled, onChange }: Props) {
       >
         <div className="flex flex-col gap-4">
           {(data.education ?? []).map((edu, i) => (
-            <div key={i} className="rounded-xl border border-slate-700/60 bg-slate-900/40 p-4">
+            <div key={i} className="rounded-xl border border-panel-border bg-panel-2/50 p-4">
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="School">
                   <input
@@ -304,7 +304,7 @@ export function CandidateForm({ data, filled, onChange }: Props) {
         </div>
         <button
           type="button"
-          className="mt-4 text-sm font-medium text-brand-400 hover:text-brand-300"
+          className="mt-4 text-sm font-semibold text-brand-300 hover:text-brand-200"
           onClick={() => onChange({ ...data, education: [...(data.education ?? []), {}] })}
         >
           + Add education
@@ -498,7 +498,7 @@ export function CandidateForm({ data, filled, onChange }: Props) {
         ))}
         <button
           type="button"
-          className="text-sm font-medium text-brand-400 hover:text-brand-300"
+          className="text-sm font-semibold text-brand-300 hover:text-brand-200"
           onClick={() =>
             onChange({
               ...data,

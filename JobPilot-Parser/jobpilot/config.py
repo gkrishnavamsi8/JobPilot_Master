@@ -56,6 +56,8 @@ class Settings(BaseSettings):
     # Set DATABASE_URL in .env — Supabase: Project Settings → Database → Connection string
     database_url: str = "sqlite:///./data/jobpilot.db"
     upload_dir: Path = Path("./data/uploads")
+    # Signs auth tokens — override with SECRET_KEY in .env for production
+    secret_key: str = "jobpilot-dev-secret-change-me"
 
     @field_validator("database_url", mode="before")
     @classmethod

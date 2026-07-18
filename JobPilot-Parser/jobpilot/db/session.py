@@ -21,6 +21,23 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 def init_db() -> None:
     settings.ensure_dirs()
     Base.metadata.create_all(bind=engine)
+    _apply_light_migrations()
+
+
+def _apply_light_migrations() -> None:
+    """Add columns introduced after a table already exists (create_all won't)."""
+    with engine.begin() as conn:
+        if settings.is_sqlite:
+            cols = {
+                row[1]
+                for row in conn.exec_driver_sql("PRAGMA table_info(candidates)")
+            }
+            if cols and "user_id" not in cols:
+                conn.exec_driver_sql("ALTER TABLE candidates ADD COLUMN user_id CHAR(32)")
+        else:
+            conn.exec_driver_sql(
+                "ALTER TABLE candidates ADD COLUMN IF NOT EXISTS user_id UUID"
+            )
 
 
 def check_db_connection() -> None:

@@ -2,7 +2,16 @@
 
 End-to-end job search workflow:
 
-**Parse resume → Scrape jobs → Preview match → Apply → Extension overlay → Autofill**
+**Sign in → Parse resume → Scrape jobs → Preview match → Apply & track → Extension overlay → Autofill**
+
+The unified web app has account login (register/sign-in), a dashboard, profile
+(resume parsing), a scored job browser, and an application tracker. The Parser
+API owns auth (`/auth/register`, `/auth/login`, `/auth/me`) and application
+logging (`/applications`); tokens are HMAC-signed — set `SECRET_KEY` in
+`JobPilot-Parser/.env` for production. The Parser runs on SQLite out of the box,
+so login → profile → jobs → applications works with no Supabase configured
+(the job browser falls back to labeled sample listings until the Scraper API
+is up).
 
 ## Projects
 
@@ -73,11 +82,14 @@ Load unpacked from `job-autofill-scraper/extension/` in Chrome.
 
 ## User journey
 
-1. Open **http://localhost:5173/profile** → upload resume → save profile
-2. Open **http://localhost:5173/jobs** → browse scraped jobs with match preview
-3. Click **Apply** → ATS page opens with `jp_candidate` + `jp_job` URL params
-4. Extension shows **match overlay** on the apply page
-5. Click **Autofill application** → form filled from saved profile
+1. Open **http://localhost:5173** → create an account or sign in
+2. **Dashboard** shows profile strength, jobs viewed, and applied counts
+3. **Profile** → upload resume → review parsed fields → save (one profile per account)
+4. **Jobs** → browse scored listings (match ring + matched/missing skills)
+5. Click **Apply** → ATS page opens with `jp_candidate` + `jp_job` URL params, and the event is tracked
+6. **Applications** → every opened job with its match snapshot; mark viewed/applied/skipped
+7. Extension shows **match overlay** on the apply page
+8. Click **Autofill application** → form filled from saved profile
 
 ## Testing
 
@@ -91,6 +103,9 @@ Runs match-core unit tests + integration smoke tests.
 
 | Service | Endpoint |
 |---------|----------|
+| Parser | `POST /auth/register` · `POST /auth/login` · `GET /auth/me` |
+| Parser | `GET /candidates/me` (auth) |
+| Parser | `POST /applications` · `GET /applications` · `PATCH /applications/{id}` (auth) |
 | Parser | `GET /candidates/{id}/match-text` |
 | Scraper | `GET /api/jobs/by-key?company_id=&source=&job_id=` |
 | Scraper | `GET /api/jobs/by-url?url=` |

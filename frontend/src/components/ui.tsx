@@ -28,14 +28,14 @@ interface SectionProps {
 
 export function Section({ title, description, icon, children }: SectionProps) {
   return (
-    <section className="section-card">
+    <section className="card p-6">
       <div className="mb-6 flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/15 text-brand-400">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/15 text-brand-300">
           {icon}
         </div>
         <div>
           <h2 className="text-lg font-semibold text-white">{title}</h2>
-          {description && <p className="mt-0.5 text-sm text-slate-400">{description}</p>}
+          {description && <p className="mt-0.5 text-sm text-ink-2">{description}</p>}
         </div>
       </div>
       {children}

@@ -24,11 +24,13 @@ def create_candidate(
     *,
     resume_path: str | None = None,
     resume_filename: str | None = None,
+    user_id: str | None = None,
 ) -> CandidateRecord:
     data = payload.model_dump(mode="json")
     email, first_name, last_name = _index_fields(data)
     record = CandidateRecord(
         id=str(uuid.uuid4()),
+        user_id=user_id,
         email=email,
         first_name=first_name,
         last_name=last_name,
@@ -40,6 +42,16 @@ def create_candidate(
     db.commit()
     db.refresh(record)
     return record
+
+
+def get_candidate_for_user(db: Session, user_id: str) -> CandidateRecord | None:
+    """Most recently updated profile owned by this user."""
+    return (
+        db.query(CandidateRecord)
+        .filter(CandidateRecord.user_id == user_id)
+        .order_by(CandidateRecord.updated_at.desc())
+        .first()
+    )
 
 
 def update_candidate(

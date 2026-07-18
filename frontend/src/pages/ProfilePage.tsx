@@ -6,7 +6,7 @@ import {
   WifiOff,
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { checkHealth, parseResume, saveCandidate } from '../api';
+import { checkHealth, getMyCandidate, parseResume, saveCandidate } from '../api';
 import { CandidateForm } from '../components/CandidateForm';
 import { ResumeUpload } from '../components/ResumeUpload';
 import { setStoredCandidate } from '../lib/session';
@@ -19,6 +19,7 @@ export function ProfilePage() {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [parsing, setParsing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [loadingExisting, setLoadingExisting] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [online, setOnline] = useState<boolean | null>(null);
@@ -28,6 +29,24 @@ export function ProfilePage() {
     checkHealth()
       .then((h) => setOnline(h.database === 'postgres' || h.database === 'sqlite'))
       .catch(() => setOnline(false));
+
+    // Load the signed-in user's saved profile so edits continue where they left off.
+    getMyCandidate()
+      .then((record) => {
+        if (record?.data) {
+          const base = emptyCandidate();
+          setData({
+            ...base,
+            ...record.data,
+            profile: { ...base.profile, ...record.data.profile },
+            preferences: { ...base.preferences, ...record.data.preferences },
+          });
+          setStoredCandidate(record.id, record.data);
+          setParseKey((k) => k + 1);
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => setLoadingExisting(false));
   }, []);
 
   const handleResume = useCallback(async (file: File) => {
@@ -92,30 +111,25 @@ export function ProfilePage() {
   };
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 animate-fade-up">
         <div>
-          <h2 className="text-2xl font-bold text-white">Your profile</h2>
-          <p className="mt-1 text-sm text-slate-400">
-            Upload your resume once — used for match scoring and extension autofill.
+          <h2 className="text-2xl font-bold tracking-tight text-white">Your profile</h2>
+          <p className="mt-1 text-sm text-ink-2">
+            Upload your resume once — it powers match scoring and extension autofill.
           </p>
         </div>
         <div className="flex items-center gap-3">
           {online === null ? null : online ? (
-            <span className="flex items-center gap-1.5 text-xs text-emerald-400">
-              <Wifi className="h-3.5 w-3.5" /> DB connected
+            <span className="chip border border-emerald-500/25 bg-emerald-500/10 text-emerald-300">
+              <Wifi className="h-3 w-3" /> DB connected
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 text-xs text-amber-400">
-              <WifiOff className="h-3.5 w-3.5" /> API offline
+            <span className="chip border border-amber-500/25 bg-amber-500/10 text-amber-300">
+              <WifiOff className="h-3 w-3" /> API offline
             </span>
           )}
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving}
-            className="flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 transition hover:bg-brand-500 disabled:opacity-60"
-          >
+          <button type="button" onClick={handleSave} disabled={saving} className="btn-primary">
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Save profile
           </button>
@@ -123,12 +137,12 @@ export function ProfilePage() {
       </div>
 
       {error && (
-        <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300 animate-fade-in">
           {error}
         </div>
       )}
       {success && (
-        <div className="mb-6 flex items-start gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200 animate-fade-in">
           <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" />
           <div>
             <p className="font-semibold">Profile saved — ready for Jobs and extension autofill</p>
@@ -139,7 +153,7 @@ export function ProfilePage() {
         </div>
       )}
 
-      <div className="mb-8">
+      <div className="mb-8 animate-fade-up" style={{ animationDelay: '80ms' }}>
         <ResumeUpload onFile={handleResume} loading={parsing} fileName={resumeFile?.name} />
         {filled.size > 0 && (
           <p className="mt-3 text-center text-sm text-emerald-400">
@@ -148,7 +162,15 @@ export function ProfilePage() {
         )}
       </div>
 
-      <CandidateForm key={parseKey} data={data} filled={filled} onChange={setData} />
+      {loadingExisting ? (
+        <div className="flex items-center justify-center py-16 text-ink-2">
+          <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading your saved profile…
+        </div>
+      ) : (
+        <div className="animate-fade-up" style={{ animationDelay: '140ms' }}>
+          <CandidateForm key={parseKey} data={data} filled={filled} onChange={setData} />
+        </div>
+      )}
     </main>
   );
 }
