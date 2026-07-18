@@ -242,3 +242,61 @@ export function fetchJobs(params?: {
   query.set('offset', String(params?.offset ?? 0));
   return request(`${SCRAPER_API}/jobs?${query.toString()}`, 'Failed to load jobs from scraper API');
 }
+
+// ---------------------------------------------------------------------------
+// Scraper admin (Scraper API)
+// ---------------------------------------------------------------------------
+
+export interface Company {
+  id: string;
+  name: string;
+  careers_url?: string | null;
+  platform?: string | null;
+  supported: boolean;
+}
+
+export interface ScrapeFilters {
+  date_scope?: 'today' | 'all';
+  keyword?: string | null;
+  location?: string | null;
+  limit?: number | null;
+}
+
+export interface ScrapeRun {
+  id: string;
+  company_id: string;
+  company_name?: string | null;
+  platform: string;
+  status: string;
+  stubs_seen: number;
+  details_fetched: number;
+  matched: number;
+  errors: number;
+  total_pages: number;
+  error_message?: string | null;
+  started_at: string;
+  finished_at?: string | null;
+}
+
+export function fetchCompanies(): Promise<Company[]> {
+  return request(`${SCRAPER_API}/companies`, 'Failed to load companies');
+}
+
+export function startScrape(
+  companyId: string,
+  filters: ScrapeFilters,
+): Promise<{ run_id: string; status: string }> {
+  return request(
+    `${SCRAPER_API}/scrape`,
+    'Failed to start scrape',
+    jsonInit('POST', { company_id: companyId, filters }),
+  );
+}
+
+export function fetchRuns(limit = 8): Promise<ScrapeRun[]> {
+  return request(`${SCRAPER_API}/runs?limit=${limit}`, 'Failed to load runs');
+}
+
+export function fetchRun(runId: string): Promise<ScrapeRun> {
+  return request(`${SCRAPER_API}/runs/${runId}`, 'Run not found');
+}

@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   LogOut,
   Plane,
+  Radar,
   UserCircle2,
 } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom';
@@ -13,6 +14,7 @@ const NAV = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/profile', label: 'Profile', icon: UserCircle2 },
   { to: '/jobs', label: 'Jobs', icon: Briefcase },
+  { to: '/scraper', label: 'Scraper', icon: Radar },
   { to: '/applications', label: 'Applications', icon: ClipboardList },
 ];
 

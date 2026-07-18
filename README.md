@@ -86,6 +86,8 @@ Load unpacked from `job-autofill-scraper/extension/` in Chrome.
 2. **Dashboard** shows profile strength, jobs viewed, and applied counts
 3. **Profile** → upload resume → review parsed fields → save (one profile per account)
 4. **Jobs** → browse scored listings (match ring + matched/missing skills)
+   - **Scraper** → admin page to run scrapes from the UI: pick a company, set filters, watch the run live
+
 5. Click **Apply** → ATS page opens with `jp_candidate` + `jp_job` URL params, and the event is tracked
 6. **Applications** → every opened job with its match snapshot; mark viewed/applied/skipped
 7. Extension shows **match overlay** on the apply page

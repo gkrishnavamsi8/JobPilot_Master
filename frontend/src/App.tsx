@@ -8,6 +8,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { JobsPage } from './pages/JobsPage';
 import { LoginPage } from './pages/LoginPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { ScraperPage } from './pages/ScraperPage';
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const { user, initializing } = useAuth();
@@ -43,6 +44,7 @@ export default function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/jobs" element={<JobsPage />} />
+            <Route path="/scraper" element={<ScraperPage />} />
             <Route path="/applications" element={<ApplicationsPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
