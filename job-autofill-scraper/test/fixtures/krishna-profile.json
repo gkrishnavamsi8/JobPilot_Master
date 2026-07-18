@@ -1,0 +1,39 @@
+{
+  "legal": {
+    "terms_accepted": false,
+    "marketing_opt_in": null,
+    "privacy_policy_accepted": false,
+    "background_check_consent": null
+  },
+  "profile": {
+    "email": "gangisettykrishnavamsi@gmail.com",
+    "phone": {
+      "type": "mobile",
+      "number": "+91-7780150531",
+      "country_code": null
+    },
+    "skills": ["Java", "Python", "Spring Boot", "Kafka"],
+    "social": {
+      "website": "https://vamsigangisetty.in",
+      "linkedin": "https://linkedin.com/in/gkrishnavamsi8"
+    },
+    "address": {
+      "city": "Pune",
+      "line1": "Kharadi",
+      "state": "Maharashtra",
+      "country": "India",
+      "postal_code": "412207"
+    },
+    "summary": "Backend Engineer with 3+ years of experience.",
+    "last_name": "Vamsi Gangisetty",
+    "first_name": "Krishna"
+  },
+  "work_experience": [
+    {
+      "title": "Software Developer",
+      "company": "Amdocs",
+      "location": "Pune",
+      "is_current": true
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JobPilot Autofill</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <header>
+        <h1>JobPilot</h1>
+        <p class="subtitle">Universal job form autofill</p>
+      </header>
+
+      <section class="mode-toggle">
+        <label class="radio">
+          <input type="radio" name="dataMode" value="json" checked />
+          Paste JSON (test mode)
+        </label>
+        <label class="radio">
+          <input type="radio" name="dataMode" value="api" />
+          Fetch from API
+        </label>
+      </section>
+
+      <section id="jsonPanel" class="panel">
+        <label>
+          Candidate JSON
+          <textarea
+            id="candidateJson"
+            rows="10"
+            spellcheck="false"
+            placeholder='Paste your candidate "data" jsonb object here…'
+          ></textarea>
+        </label>
+        <button id="loadSample" type="button" class="secondary">Load sample data</button>
+      </section>
+
+      <section id="apiPanel" class="panel hidden">
+        <label>
+          API Base URL
+          <input id="apiBaseUrl" type="url" placeholder="http://localhost:3001" />
+        </label>
+        <label>
+          API Key
+          <input id="apiKey" type="password" placeholder="Optional" autocomplete="off" />
+        </label>
+        <fieldset class="lookup-mode">
+          <legend>Lookup by</legend>
+          <label class="radio">
+            <input type="radio" name="lookupMode" value="email" checked />
+            Email
+          </label>
+          <label class="radio">
+            <input type="radio" name="lookupMode" value="id" />
+            Candidate ID
+          </label>
+        </fieldset>
+        <label id="emailLookupLabel">
+          Email
+          <input id="candidateEmail" type="email" placeholder="gangisettykrishnavamsi@gmail.com" />
+        </label>
+        <label id="idLookupLabel" class="hidden">
+          Candidate ID
+          <input id="candidateId" type="text" placeholder="UUID from candidates table" />
+        </label>
+        <button id="saveSettings" type="button" class="secondary">Save API settings</button>
+        <button id="fetchProfile" type="button" class="secondary">Fetch profile</button>
+        <p id="cacheStatus" class="cache-status" aria-live="polite"></p>
+      </section>
+
+      <section class="actions">
+        <button id="fillPage" type="button" class="primary">Fill this page</button>
+        <button id="validateJson" type="button" class="secondary">Validate JSON</button>
+      </section>
+
+      <section id="status" class="status" aria-live="polite"></section>
+    </main>
+    <script src="popup.js" type="module"></script>
+  </body>
+</html>

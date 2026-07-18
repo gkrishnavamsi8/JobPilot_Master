@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workday Mock Application — JobPilot Test</title>
+    <style>
+      :root {
+        font-family: system-ui, sans-serif;
+        color: #1f2937;
+        background: #f8fafc;
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+      }
+      .page {
+        max-width: 760px;
+        margin: 0 auto;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      fieldset {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin: 16px 0;
+        padding: 16px;
+      }
+      legend {
+        font-weight: 700;
+        padding: 0 8px;
+      }
+      label {
+        display: block;
+        margin: 12px 0 4px;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+      }
+      .dropdown {
+        position: relative;
+      }
+      .dropdown-trigger {
+        width: 100%;
+        text-align: left;
+        padding: 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+      }
+      .dropdown-menu {
+        display: none;
+        position: absolute;
+        z-index: 10;
+        width: 100%;
+        margin: 4px 0 0;
+        padding: 0;
+        list-style: none;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        background: white;
+        max-height: 180px;
+        overflow: auto;
+      }
+      .dropdown.open .dropdown-menu {
+        display: block;
+      }
+      .dropdown-menu li {
+        padding: 10px;
+        cursor: pointer;
+      }
+      .dropdown-menu li:hover {
+        background: #eff6ff;
+      }
+      .multiselect {
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 8px;
+      }
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+      .tag {
+        background: #dbeafe;
+        color: #1d4ed8;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 0.85rem;
+      }
+      .suggestions {
+        display: none;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        margin-top: 6px;
+        list-style: none;
+        padding: 0;
+      }
+      .suggestions.open {
+        display: block;
+      }
+      .suggestions li {
+        padding: 8px 10px;
+        cursor: pointer;
+      }
+      .suggestions li:hover {
+        background: #eff6ff;
+      }
+      .entry {
+        border: 1px dashed #cbd5e1;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+      .add-btn,
+      .submit-btn {
+        margin-top: 8px;
+        padding: 10px 14px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .add-btn {
+        background: #e5e7eb;
+      }
+      .submit-btn {
+        background: #2563eb;
+        color: white;
+      }
+      .hint {
+        color: #64748b;
+        font-size: 0.85rem;
+      }
+      .jobpilot-highlight-resume {
+        outline: 2px solid #f59e0b !important;
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <h1>Software Engineer Application</h1>
+      <p class="hint">
+        Mock Workday form for JobPilot testing. Load the extension, paste JSON in the popup, and click
+        <strong>Fill this page</strong>.
+      </p>
+
+      <form id="applicationForm" onsubmit="return false;">
+        <fieldset>
+          <legend>Personal Information</legend>
+
+          <label for="firstName">Legal First Name</label>
+          <input id="firstName" data-automation-id="legalNameSection_firstName" type="text" />
+
+          <label for="lastName">Legal Last Name</label>
+          <input id="lastName" data-automation-id="legalNameSection_lastName" type="text" />
+
+          <label for="email">Email Address</label>
+          <input id="email" data-automation-id="emailAddress" type="email" />
+
+          <label for="phone">Phone Number</label>
+          <input id="phone" data-automation-id="phoneNumber" type="text" />
+
+          <label for="addressLine1">Address Line 1</label>
+          <input id="addressLine1" data-automation-id="addressLine1" type="text" />
+
+          <label for="city">City</label>
+          <input id="city" data-automation-id="addressCity" type="text" />
+
+          <label for="state">State</label>
+          <input id="state" data-automation-id="addressState" type="text" />
+
+          <label for="postal">Postal Code</label>
+          <input id="postal" data-automation-id="postalCode" type="text" />
+
+          <label>Country</label>
+          <div class="dropdown" data-automation-id="addressCountry" role="combobox" aria-expanded="false">
+            <button type="button" class="dropdown-trigger" aria-haspopup="listbox">
+              Select One
+            </button>
+            <ul class="dropdown-menu" role="listbox">
+              <li role="option">United States</li>
+              <li role="option">Canada</li>
+              <li role="option">United Kingdom</li>
+              <li role="option">India</li>
+            </ul>
+          </div>
+
+          <label for="summary">Professional Summary</label>
+          <textarea id="summary" data-automation-id="professionalSummary" rows="4"></textarea>
+        </fieldset>
+
+        <fieldset>
+          <legend>Skills</legend>
+          <div class="multiselect" data-automation-id="skillsMultiselect">
+            <div class="tags" id="skillTags"></div>
+            <input id="skillInput" type="text" placeholder="Type a skill…" autocomplete="off" />
+            <ul class="suggestions" id="skillSuggestions" role="listbox"></ul>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Preferences</legend>
+          <label for="yearsExp">Years of Experience</label>
+          <input id="yearsExp" data-automation-id="yearsOfExperience" type="text" />
+
+          <label>
+            <input id="terms" data-automation-id="termsAndConditions" type="checkbox" />
+            I agree to the terms and privacy policy
+          </label>
+        </fieldset>
+
+        <fieldset data-automation-id="workExperienceSection">
+          <legend>Work Experience</legend>
+          <div id="workEntries">
+            <div class="entry repeatable-entry" data-automation-id="workExperienceEntry" data-entry-index="0">
+              <label>Job Title</label>
+              <input data-automation-id="jobTitle" type="text" />
+              <label>Company</label>
+              <input data-automation-id="companyName" type="text" />
+              <label>Location</label>
+              <input data-automation-id="workLocation" type="text" />
+              <label>Description</label>
+              <textarea data-automation-id="jobDescription" rows="3"></textarea>
+            </div>
+          </div>
+          <button type="button" class="add-btn" data-automation-id="workExperienceAdd">
+            Add Another
+          </button>
+        </fieldset>
+
+        <fieldset data-automation-id="educationSection">
+          <legend>Education</legend>
+          <div id="educationEntries">
+            <div class="entry repeatable-entry" data-automation-id="educationEntry" data-entry-index="0">
+              <label>School</label>
+              <input data-automation-id="schoolName" type="text" />
+              <label>Degree</label>
+              <input data-automation-id="degree" type="text" />
+              <label>Field of Study</label>
+              <input data-automation-id="fieldOfStudy" type="text" />
+              <label>GPA</label>
+              <input data-automation-id="gpa" type="text" />
+            </div>
+          </div>
+          <button type="button" class="add-btn" data-automation-id="educationAdd">Add Another</button>
+        </fieldset>
+
+        <fieldset>
+          <legend>Resume</legend>
+          <label for="resume">Upload Resume</label>
+          <input id="resume" data-automation-id="resumeUpload" type="file" accept=".pdf,.doc,.docx" />
+        </fieldset>
+
+        <button type="submit" class="submit-btn">Submit Application</button>
+      </form>
+    </div>
+
+    <script>
+      const SKILL_OPTIONS = [
+        'TypeScript',
+        'JavaScript',
+        'React',
+        'Node.js',
+        'PostgreSQL',
+        'Python',
+        'AWS',
+      ];
+
+      document.querySelectorAll('.dropdown').forEach((dropdown) => {
+        const trigger = dropdown.querySelector('.dropdown-trigger');
+        const menu = dropdown.querySelector('.dropdown-menu');
+        trigger.addEventListener('click', () => {
+          dropdown.classList.toggle('open');
+          dropdown.setAttribute('aria-expanded', dropdown.classList.contains('open'));
+        });
+        menu.querySelectorAll('[role="option"]').forEach((option) => {
+          option.addEventListener('click', () => {
+            trigger.textContent = option.textContent;
+            dropdown.classList.remove('open');
+            dropdown.setAttribute('aria-expanded', 'false');
+          });
+        });
+      });
+
+      const skillInput = document.getElementById('skillInput');
+      const skillTags = document.getElementById('skillTags');
+      const skillSuggestions = document.getElementById('skillSuggestions');
+      const selectedSkills = new Set();
+
+      function renderSkillTags() {
+        skillTags.innerHTML = '';
+        for (const skill of selectedSkills) {
+          const tag = document.createElement('span');
+          tag.className = 'tag';
+          tag.dataset.tag = skill;
+          tag.textContent = skill;
+          skillTags.appendChild(tag);
+        }
+      }
+
+      function showSuggestions(value) {
+        skillSuggestions.innerHTML = '';
+        const matches = SKILL_OPTIONS.filter(
+          (skill) =>
+            skill.toLowerCase().includes(value.toLowerCase()) && !selectedSkills.has(skill)
+        );
+        if (!value.trim() || matches.length === 0) {
+          skillSuggestions.classList.remove('open');
+          return;
+        }
+        for (const skill of matches) {
+          const li = document.createElement('li');
+          li.setAttribute('role', 'option');
+          li.textContent = skill;
+          li.addEventListener('click', () => addSkill(skill));
+          skillSuggestions.appendChild(li);
+        }
+        skillSuggestions.classList.add('open');
+      }
+
+      function addSkill(skill) {
+        selectedSkills.add(skill);
+        renderSkillTags();
+        skillInput.value = '';
+        skillSuggestions.classList.remove('open');
+      }
+
+      skillInput.addEventListener('input', (event) => {
+        showSuggestions(event.target.value);
+      });
+
+      skillInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          const value = event.target.value.trim();
+          if (value) addSkill(value);
+        }
+      });
+
+      function cloneEntry(templateHtml, index) {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = templateHtml.trim();
+        const entry = wrapper.firstElementChild;
+        entry.dataset.entryIndex = String(index);
+        return entry;
+      }
+
+      document.querySelector('[data-automation-id="workExperienceAdd"]').addEventListener('click', () => {
+        const container = document.getElementById('workEntries');
+        const template = container.querySelector('.entry').outerHTML;
+        const entry = cloneEntry(template, container.children.length);
+        entry.querySelectorAll('input, textarea').forEach((el) => {
+          el.value = '';
+        });
+        container.appendChild(entry);
+      });
+
+      document.querySelector('[data-automation-id="educationAdd"]').addEventListener('click', () => {
+        const container = document.getElementById('educationEntries');
+        const template = container.querySelector('.entry').outerHTML;
+        const entry = cloneEntry(template, container.children.length);
+        entry.querySelectorAll('input, textarea').forEach((el) => {
+          el.value = '';
+        });
+        container.appendChild(entry);
+      });
+    </script>
+  </body>
+</html>

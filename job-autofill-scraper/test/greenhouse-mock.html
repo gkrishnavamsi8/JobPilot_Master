@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Greenhouse Mock — JobPilot Test</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 640px; margin: 24px auto; padding: 0 16px; }
+      label { display: block; font-weight: 600; margin: 12px 0 4px; }
+      input[type="text"], input[type="email"], input[type="tel"] {
+        width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;
+      }
+      .field { margin-bottom: 16px; }
+      .remix-css-b62m3t-container { position: relative; border: 1px solid #ccc; border-radius: 4px; }
+      .remix-css-13cymwt-control { padding: 8px; cursor: pointer; min-height: 38px; }
+      .remix-css-menu { display: none; border: 1px solid #ccc; background: white; position: absolute; width: 100%; z-index: 10; }
+      .remix-css-b62m3t-container.open .remix-css-menu { display: block; }
+      .remix-css-menu [role="option"] { padding: 8px; cursor: pointer; }
+      .remix-css-menu [role="option"]:hover { background: #eff6ff; }
+    </style>
+  </head>
+  <body>
+    <h1>Apply for this job</h1>
+    <form id="application">
+      <div class="field">
+        <label for="first_name">First Name<span>*</span></label>
+        <input id="first_name" name="job_application[first_name]" type="text" autocomplete="given-name" />
+      </div>
+      <div class="field">
+        <label for="last_name">Last Name<span>*</span></label>
+        <input id="last_name" name="job_application[last_name]" type="text" autocomplete="family-name" />
+      </div>
+      <div class="field">
+        <label for="email">Email<span>*</span></label>
+        <input id="email" name="job_application[email]" type="email" autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="country">Country<span>*</span></label>
+        <div class="remix-css-b62m3t-container" id="country">
+          <div class="remix-css-13cymwt-control" role="combobox" aria-expanded="false" aria-labelledby="country-label">
+            <span class="selected-value">Select a country</span>
+          </div>
+          <div class="remix-css-menu" role="listbox">
+            <div role="option">India</div>
+            <div role="option">United States</div>
+            <div role="option">United Kingdom</div>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="phone">Phone<span>*</span></label>
+        <input id="phone" name="job_application[phone]" type="tel" autocomplete="tel" />
+      </div>
+      <div class="field">
+        <label for="website">Website</label>
+        <input id="website" name="job_application[website]" type="text" />
+      </div>
+      <div class="field">
+        <label for="linkedin">LinkedIn Profile</label>
+        <input id="linkedin" name="job_application[linkedin]" type="text" />
+      </div>
+    </form>
+    <script>
+      document.querySelectorAll('[role="combobox"]').forEach((combo) => {
+        combo.addEventListener('click', () => {
+          const container = combo.closest('.remix-css-b62m3t-container');
+          container?.classList.toggle('open');
+        });
+      });
+      document.querySelectorAll('[role="option"]').forEach((opt) => {
+        opt.addEventListener('click', () => {
+          const container = opt.closest('.remix-css-b62m3t-container');
+          const display = container?.querySelector('.selected-value');
+          if (display) display.textContent = opt.textContent;
+          container?.classList.remove('open');
+        });
+      });
+    </script>
+  </body>
+</html>
